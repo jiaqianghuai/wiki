@@ -7,7 +7,7 @@ keywords: wiki
 description: personal wiki about my life and work
 author: jasonqhjia
 
-root: /wiki
+root: /wiki/
 
 deploy:
     - type: git
