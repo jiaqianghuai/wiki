@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/tango.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>Linux Command - Qianghuai Jia's Personal Wiki</title>
+    <meta name="keywords" content="wiki"/>
+    <meta name="description" content="personal wiki about my life and work"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+
+  <body>
+    <div id="container">
+      
+<div id="header">
+  <div class="post-nav"><a href="/wiki/">Home</a>&nbsp;&#187;&nbsp;<a href="/wiki/#courses">courses</a>&nbsp;&#187;&nbsp;Linux Command
+    <span class="updated">Updated&nbsp;
+      2016-07-13 23:35
+    </span></div>
+</div>
+<div class="clearfix"></div>
+
+<div class="page_title">Linux Command</div>
+
+  <div class="toc"><span class="toctitle">Table of Contents</span><ul>
+<li><a href="#linux-">Linux用户管理---创建账户和删除账户</a><ul>
+<li><a href="#_1">常用命令</a><ul>
+<li><a href="#_2">创建用户</a></li>
+<li><a href="#_3">用户删除命令</a></li>
+</ul>
+</li>
+<li><a href="#adduser">使用adduser</a></li>
+<li><a href="#useradd">使用useradd</a></li>
+<li><a href="#_4">删除用户命令</a><ul>
+<li><a href="#_5">只删除用户</a></li>
+<li><a href="#_6">连同用户主目录一块删除</a></li>
+</ul>
+</li>
+<li><a href="#_7">相关文件</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="linux-">Linux用户管理---创建账户和删除账户</h1>
+<h2 id="_1">常用命令</h2>
+<h3 id="_2">创建用户</h3>
+<div class="hlcode"><pre><span class="n">adduser</span><span class="err">：会自动为创建的用户制定目录、系统</span><span class="n">shell</span><span class="err">版本，会在创建时输入用户密码。</span>
+<span class="n">useradd</span><span class="err">：需要使用参数选项指定上述基本设置，如果不使用任何参数，则创建的用户无密码、无主目录、没有制定</span><span class="n">shell</span><span class="err">版本</span><span class="p">.</span>
+</pre></div>
+
+
+<h3 id="_3">用户删除命令</h3>
+<div class="hlcode"><pre><span class="n">userdel</span>
+</pre></div>
+
+
+<h2 id="adduser">使用adduser</h2>
+<div class="hlcode"><pre><span class="err">如：</span><span class="n">adduser</span>   <span class="n">apple</span>
+<span class="err">默认情况下：</span>
+
+<span class="n">adduser</span><span class="err">在创建用户时会主动调用</span>  <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">adduser</span><span class="p">.</span><span class="n">conf</span><span class="err">；</span>
+
+<span class="err">在创建用户主目录时默认在</span><span class="o">/</span><span class="n">home</span><span class="err">下，而且创建为</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="err">用户名</span><span class="p">.</span>
+
+<span class="err">如果主目录已经存在，就不再创建，但是此主目录虽然作为新用户的主目录，而且默认登录时会进入这个目录下，但是这个目录并不是属于新用户，当使用</span><span class="n">userdel</span><span class="err">删除新用户时，并不会删除这个主目录，因为这个主目录在创建前已经存在且并不属于这个用户</span><span class="p">.</span>
+
+<span class="err">为用户指定</span><span class="n">shell</span><span class="err">版本为：</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">bash</span>
+</pre></div>
+
+
+<h2 id="useradd">使用useradd</h2>
+<div class="hlcode"><pre><span class="err">如</span>
+
+<span class="n">sudo</span>  <span class="n">useradd</span>  <span class="o">-</span><span class="n">d</span>  <span class="s">&quot;/home/tt&quot;</span>   <span class="o">-</span><span class="n">m</span>   <span class="o">-</span><span class="n">s</span> <span class="s">&quot;/bin/bash&quot;</span>   <span class="n">tt</span>
+
+<span class="err">解释：</span>   <span class="o">-</span><span class="n">d</span>   <span class="err">“</span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">tt</span><span class="s">&quot; ：就是指定/home/tt为主目录.</span>
+
+        <span class="o">-</span><span class="n">m</span>   <span class="err">就是如果</span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">tt</span><span class="err">不存在就强制创建</span><span class="p">.</span>
+
+        <span class="o">-</span><span class="n">s</span>    <span class="err">就是指定</span><span class="n">shell</span><span class="err">版本</span><span class="p">.</span>
+
+<span class="err">修改</span><span class="n">tt</span><span class="err">密码：</span>
+
+<span class="err">$</span>  <span class="n">sudo</span> <span class="n">passwd</span> <span class="n">tt</span>
+
+<span class="n">ps</span><span class="err">：</span>
+    <span class="o">*</span> <span class="o">-</span><span class="n">d</span><span class="err">：</span>           <span class="err">指定用户的主目录</span><span class="p">.</span>
+    <span class="o">*</span> <span class="o">-</span><span class="n">m</span><span class="err">：</span>          <span class="err">如果存在不再创建，但是此目录并不属于新创建用户；如果主目录不存在，则强制创建；</span> <span class="o">-</span><span class="n">m</span><span class="err">和</span><span class="o">-</span><span class="n">d</span><span class="err">一块使用</span><span class="p">.</span>
+    <span class="o">*</span> <span class="o">-</span><span class="n">s</span><span class="err">：</span>           <span class="err">指定用户登录时的</span><span class="n">shell</span><span class="err">版本</span><span class="p">.</span>
+    <span class="o">*</span> <span class="o">-</span><span class="n">M</span><span class="err">：</span>           <span class="err">不创建主目录</span>
+</pre></div>
+
+
+<h2 id="_4">删除用户命令</h2>
+<h3 id="_5">只删除用户</h3>
+<div class="hlcode"><pre><span class="n">sudo</span>   <span class="n">userdel</span>   <span class="err">用户名</span>
+</pre></div>
+
+
+<h3 id="_6">连同用户主目录一块删除</h3>
+<div class="hlcode"><pre><span class="n">sudo</span>  <span class="n">userdel</span>   <span class="o">-</span><span class="n">r</span>   <span class="err">用户名</span>
+</pre></div>
+
+
+<h2 id="_7">相关文件</h2>
+<div class="hlcode"><pre><span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">passwd</span> <span class="o">-</span> <span class="err">使</span> <span class="err">用</span> <span class="err">者</span> <span class="err">帐</span> <span class="err">号</span> <span class="err">资</span> <span class="err">讯，可以查看用户信息</span>
+<span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">shadow</span> <span class="o">-</span> <span class="err">使</span> <span class="err">用</span> <span class="err">者</span> <span class="err">帐</span> <span class="err">号</span> <span class="err">资</span> <span class="err">讯</span> <span class="err">加</span> <span class="err">密</span>
+<span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">group</span> <span class="o">-</span> <span class="err">群</span> <span class="err">组</span> <span class="err">资</span> <span class="err">讯</span>
+<span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="k">default</span><span class="o">/</span><span class="n">useradd</span> <span class="o">-</span> <span class="err">定</span> <span class="err">义</span> <span class="err">资</span> <span class="err">讯</span>
+<span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">login</span><span class="p">.</span><span class="n">defs</span> <span class="o">-</span> <span class="err">系</span> <span class="err">统</span> <span class="err">广</span> <span class="err">义</span> <span class="err">设</span> <span class="err">定</span>
+<span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">skel</span> <span class="o">-</span> <span class="err">内</span> <span class="err">含</span> <span class="err">定</span> <span class="err">义</span> <span class="err">档</span> <span class="err">的</span> <span class="err">目</span> <span class="err">录</span>
+</pre></div>
+    </div>
+    <div id="footer">
+      <span>
+        <p>Copyright © 2016 jasonqhjia.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.</p>
+        <p>Site Generated 2016-07-14 00:02:22</p>
+      </span>
+    </div>
+  </body>
+</html>
