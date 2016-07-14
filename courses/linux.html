@@ -42,6 +42,27 @@
 <li><a href="#_7">相关文件</a></li>
 </ul>
 </li>
+<li><a href="#linuxln">Linux命令：ln命令</a><ul>
+<li><a href="#_8">概述</a></li>
+<li><a href="#_9">命令格式 ##</a></li>
+<li><a href="#_10">命令功能</a><ul>
+<li><a href="#_11">软链接</a></li>
+<li><a href="#_12">硬链接</a></li>
+</ul>
+</li>
+<li><a href="#_13">命令参数</a><ul>
+<li><a href="#_14">必要参数</a></li>
+<li><a href="#_15">选择参数</a></li>
+</ul>
+</li>
+<li><a href="#_16">使用实例</a><ul>
+<li><a href="#1">实例1：给文件创建软链接</a></li>
+<li><a href="#2">实例2：给文件创建硬链接</a></li>
+</ul>
+</li>
+<li><a href="#_17">说明</a></li>
+</ul>
+</li>
 </ul>
 </div>
 <h1 id="linux-">Linux用户管理---创建账户和删除账户</h1>
@@ -106,19 +127,110 @@
 
 
 <h2 id="_7">相关文件</h2>
-<div class="hlcode"><pre><span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">passwd</span> <span class="o">-</span> <span class="err">使</span> <span class="err">用</span> <span class="err">者</span> <span class="err">帐</span> <span class="err">号</span> <span class="err">资</span> <span class="err">讯，可以查看用户信息</span>
-<span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">shadow</span> <span class="o">-</span> <span class="err">使</span> <span class="err">用</span> <span class="err">者</span> <span class="err">帐</span> <span class="err">号</span> <span class="err">资</span> <span class="err">讯</span> <span class="err">加</span> <span class="err">密</span>
-<span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">group</span> <span class="o">-</span> <span class="err">群</span> <span class="err">组</span> <span class="err">资</span> <span class="err">讯</span>
-<span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="k">default</span><span class="o">/</span><span class="n">useradd</span> <span class="o">-</span> <span class="err">定</span> <span class="err">义</span> <span class="err">资</span> <span class="err">讯</span>
-<span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">login</span><span class="p">.</span><span class="n">defs</span> <span class="o">-</span> <span class="err">系</span> <span class="err">统</span> <span class="err">广</span> <span class="err">义</span> <span class="err">设</span> <span class="err">定</span>
-<span class="err">＊</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">skel</span> <span class="o">-</span> <span class="err">内</span> <span class="err">含</span> <span class="err">定</span> <span class="err">义</span> <span class="err">档</span> <span class="err">的</span> <span class="err">目</span> <span class="err">录</span>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">passwd</span> <span class="o">-</span> <span class="err">使</span> <span class="err">用</span> <span class="err">者</span> <span class="err">帐</span> <span class="err">号</span> <span class="err">资</span> <span class="err">讯，可以查看用户信息</span>
+<span class="mf">2.</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">shadow</span> <span class="o">-</span> <span class="err">使</span> <span class="err">用</span> <span class="err">者</span> <span class="err">帐</span> <span class="err">号</span> <span class="err">资</span> <span class="err">讯</span> <span class="err">加</span> <span class="err">密</span>
+<span class="mf">3.</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">group</span> <span class="o">-</span> <span class="err">群</span> <span class="err">组</span> <span class="err">资</span> <span class="err">讯</span>
+<span class="mf">4.</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="k">default</span><span class="o">/</span><span class="n">useradd</span> <span class="o">-</span> <span class="err">定</span> <span class="err">义</span> <span class="err">资</span> <span class="err">讯</span>
+<span class="mf">5.</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">login</span><span class="p">.</span><span class="n">defs</span> <span class="o">-</span> <span class="err">系</span> <span class="err">统</span> <span class="err">广</span> <span class="err">义</span> <span class="err">设</span> <span class="err">定</span>
+<span class="mf">6.</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">skel</span> <span class="o">-</span> <span class="err">内</span> <span class="err">含</span> <span class="err">定</span> <span class="err">义</span> <span class="err">档</span> <span class="err">的</span> <span class="err">目</span> <span class="err">录</span>
+</pre></div>
+
+
+<h1 id="linuxln">Linux命令：ln命令</h1>
+<h2 id="_8">概述</h2>
+<div class="hlcode"><pre><span class="n">ln</span><span class="err">的功能是为某一个文件在另外一个位置建立一个同步的链接。当我们需要在不同的目录，用到相同的文件时，我们不需要在每一个需要的目录下都放一个必须相同的文件，我们只要在某个固定的目录，放上该文件，然后在其它的目录下用</span><span class="n">ln</span><span class="err">命令链接（</span><span class="n">link</span><span class="err">）它就可以，不必重复的占用磁盘空间</span><span class="p">.</span>
+</pre></div>
+
+
+<h2 id="_9">命令格式 ##</h2>
+<div class="hlcode"><pre><span class="n">ln</span> <span class="p">[</span><span class="err">参数</span><span class="p">][</span><span class="err">源文件或目录</span><span class="p">][</span><span class="err">目标文件或目录</span><span class="p">]</span>
+</pre></div>
+
+
+<h2 id="_10">命令功能</h2>
+<div class="hlcode"><pre><span class="n">Linux</span><span class="err">文件系统中，有所谓的链接可以将其视为档案的别名，而链接又可分为两种</span> <span class="o">:</span> <span class="err">硬链接与软链接，硬链接的意思是一个档案可以有多个名称，而软链接的方式则是产生一个特殊的档案，该档案的内容是指向另一个档案的位置。硬链接是存在同一个文件系统中，而软链接却可以跨越不同的文件系统</span>
+</pre></div>
+
+
+<h3 id="_11">软链接</h3>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">以路径的形式存在</span><span class="p">.</span><span class="err">类似于</span><span class="n">Windows</span><span class="err">操作系统中的快捷方式</span><span class="p">.</span>
+<span class="mf">2.</span> <span class="err">可以跨文件系统</span><span class="p">,</span><span class="err">硬链接不可以</span><span class="p">.</span>
+<span class="mf">3.</span> <span class="err">可以对一个不存在的文件名进行链接</span><span class="p">.</span>
+<span class="mf">4.</span> <span class="err">可以对目录进行链接</span><span class="p">.</span>
+</pre></div>
+
+
+<h3 id="_12">硬链接</h3>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">以文件副本的形式存在</span><span class="p">,</span> <span class="err">但不占用实际空间</span><span class="p">.</span>
+<span class="mf">2.</span> <span class="err">不允许给目录创建硬链接</span><span class="p">.</span>
+<span class="mf">3.</span> <span class="err">只有在同一个文件系统中才能创建</span>
+</pre></div>
+
+
+<h2 id="_13">命令参数</h2>
+<h3 id="_14">必要参数</h3>
+<div class="hlcode"><pre><span class="o">*</span> <span class="o">-</span><span class="n">b</span> <span class="err">删除，覆盖以前建立的链接</span>
+<span class="o">*</span> <span class="o">-</span><span class="n">d</span> <span class="err">允许超级用户制作目录的硬链接</span>
+<span class="o">*</span> <span class="o">-</span><span class="n">f</span> <span class="err">强制执行</span>
+<span class="o">*</span> <span class="o">-</span><span class="n">i</span> <span class="err">交互模式，文件存在则提示用户是否覆盖</span>
+<span class="o">*</span> <span class="o">-</span><span class="n">n</span> <span class="err">把符号链接视为一般目录</span>
+<span class="o">*</span> <span class="o">-</span><span class="n">s</span> <span class="err">软链接</span><span class="p">(</span><span class="err">符号链接</span><span class="p">)</span>
+<span class="o">*</span> <span class="o">-</span><span class="n">v</span> <span class="err">显示详细的处理过程</span>
+</pre></div>
+
+
+<h3 id="_15">选择参数</h3>
+<div class="hlcode"><pre><span class="o">*</span> <span class="o">-</span><span class="n">S</span> <span class="err">“</span><span class="o">-</span><span class="n">S</span><span class="o">&lt;</span><span class="err">字尾备份字符串</span><span class="o">&gt;</span> <span class="err">”或</span> <span class="err">“</span><span class="o">--</span><span class="n">suffix</span><span class="o">=&lt;</span><span class="err">字尾备份字符串</span><span class="o">&gt;</span><span class="err">”</span>
+<span class="o">*</span> <span class="o">-</span><span class="n">V</span> <span class="err">“</span><span class="o">-</span><span class="n">V</span><span class="o">&lt;</span><span class="err">备份方式</span><span class="o">&gt;</span><span class="err">”或“</span><span class="o">--</span><span class="n">version</span><span class="o">-</span><span class="n">control</span><span class="o">=&lt;</span><span class="err">备份方式</span><span class="o">&gt;</span><span class="err">”</span>
+<span class="o">*</span> <span class="o">--</span><span class="n">help</span> <span class="err">显示帮助信息</span>
+<span class="o">*</span> <span class="o">--</span><span class="n">version</span> <span class="err">显示版本信息</span>
+</pre></div>
+
+
+<h2 id="_16">使用实例</h2>
+<h3 id="1">实例1：给文件创建软链接</h3>
+<div class="hlcode"><pre><span class="err">命令：</span><span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="n">log2013</span><span class="p">.</span><span class="n">log</span> <span class="n">link2013</span>
+
+<span class="err">输出：</span>
+<span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">localhost</span> <span class="n">test</span><span class="p">]</span><span class="err">#</span> <span class="n">ll</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">bin</span>      <span class="mi">61</span> <span class="mi">11</span><span class="o">-</span><span class="mi">13</span> <span class="mo">06</span><span class="o">:</span><span class="mo">03</span> <span class="n">log2013</span><span class="p">.</span><span class="n">log</span>
+<span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">localhost</span> <span class="n">test</span><span class="p">]</span><span class="err">#</span> <span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="n">log2013</span><span class="p">.</span><span class="n">log</span> <span class="n">link2013</span>
+<span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">localhost</span> <span class="n">test</span><span class="p">]</span><span class="err">#</span> <span class="n">ll</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>     <span class="mi">11</span> <span class="mi">12</span><span class="o">-</span><span class="mo">07</span> <span class="mi">16</span><span class="o">:</span><span class="mo">01</span> <span class="n">link2013</span> <span class="o">-&gt;</span> <span class="n">log2013</span><span class="p">.</span><span class="n">log</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">bin</span>      <span class="mi">61</span> <span class="mi">11</span><span class="o">-</span><span class="mi">13</span> <span class="mo">06</span><span class="o">:</span><span class="mo">03</span> <span class="n">log2013</span><span class="p">.</span><span class="n">log</span>
+
+<span class="err">说明：为</span><span class="n">log2013</span><span class="p">.</span><span class="n">log</span><span class="err">文件创建软链接</span><span class="n">link2013</span><span class="err">，如果</span><span class="n">log2013</span><span class="p">.</span><span class="n">log</span><span class="err">丢失，</span><span class="n">link2013</span><span class="err">将失效</span>
+</pre></div>
+
+
+<h3 id="2">实例2：给文件创建硬链接</h3>
+<div class="hlcode"><pre><span class="err">命令：</span><span class="n">ln</span> <span class="n">log2013</span><span class="p">.</span><span class="n">log</span> <span class="n">ln2013</span>
+
+<span class="err">输出：</span>
+<span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">localhost</span> <span class="n">test</span><span class="p">]</span><span class="err">#</span> <span class="n">ll</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>     <span class="mi">11</span> <span class="mi">12</span><span class="o">-</span><span class="mo">07</span> <span class="mi">16</span><span class="o">:</span><span class="mo">01</span> <span class="n">link2013</span> <span class="o">-&gt;</span> <span class="n">log2013</span><span class="p">.</span><span class="n">log</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">bin</span>      <span class="mi">61</span> <span class="mi">11</span><span class="o">-</span><span class="mi">13</span> <span class="mo">06</span><span class="o">:</span><span class="mo">03</span> <span class="n">log2013</span><span class="p">.</span><span class="n">log</span>
+<span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">localhost</span> <span class="n">test</span><span class="p">]</span><span class="err">#</span> <span class="n">ln</span> <span class="n">log2013</span><span class="p">.</span><span class="n">log</span> <span class="n">ln2013</span>
+<span class="p">[</span><span class="n">root</span><span class="err">@</span><span class="n">localhost</span> <span class="n">test</span><span class="p">]</span><span class="err">#</span> <span class="n">ll</span>
+<span class="n">lrwxrwxrwx</span> <span class="mi">1</span> <span class="n">root</span> <span class="n">root</span>     <span class="mi">11</span> <span class="mi">12</span><span class="o">-</span><span class="mo">07</span> <span class="mi">16</span><span class="o">:</span><span class="mo">01</span> <span class="n">link2013</span> <span class="o">-&gt;</span> <span class="n">log2013</span><span class="p">.</span><span class="n">log</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">2</span> <span class="n">root</span> <span class="n">bin</span>      <span class="mi">61</span> <span class="mi">11</span><span class="o">-</span><span class="mi">13</span> <span class="mo">06</span><span class="o">:</span><span class="mo">03</span> <span class="n">ln2013</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">2</span> <span class="n">root</span> <span class="n">bin</span>      <span class="mi">61</span> <span class="mi">11</span><span class="o">-</span><span class="mi">13</span> <span class="mo">06</span><span class="o">:</span><span class="mo">03</span> <span class="n">log2013</span><span class="p">.</span><span class="n">log</span>
+
+<span class="err">说明：为</span><span class="n">log2013</span><span class="p">.</span><span class="n">log</span><span class="err">创建硬链接</span><span class="n">ln2013</span><span class="err">，</span><span class="n">log2013</span><span class="p">.</span><span class="n">log</span><span class="err">与</span><span class="n">ln2013</span><span class="err">的各项属性相同</span>
+</pre></div>
+
+
+<h2 id="_17">说明</h2>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">目录只能创建软链接</span><span class="p">.</span>
+<span class="mf">2.</span> <span class="err">目录创建链接必须用绝对路径，相对路径创建会不成功，会提示：符号连接的层数过多</span> <span class="err">这样的错误</span><span class="p">.</span>
+<span class="mf">3.</span> <span class="err">在链接目标目录中修改文件都会在源文件目录中同步变化</span><span class="p">.</span>
 </pre></div>
     </div>
     <div id="footer">
       <span>
         <p>Copyright © 2016 jasonqhjia.
         Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.</p>
-        <p>Site Generated 2016-07-14 23:18:02</p>
+        <p>Site Generated 2016-07-15 00:09:01</p>
       </span>
     </div>
   </body>
