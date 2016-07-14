@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/tango.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>知识图谱 - Qianghuai Jia's Personal Wiki</title>
+    <meta name="keywords" content="wiki"/>
+    <meta name="description" content="personal wiki about my life and work"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+
+  <body>
+    <div id="container">
+      
+<div id="header">
+  <div class="post-nav"><a href="/wiki/">Home</a>&nbsp;&#187;&nbsp;<a href="/wiki/#courses">courses</a>&nbsp;&#187;&nbsp;知识图谱
+    <span class="updated">Updated&nbsp;
+      2016-07-15 00:16
+    </span></div>
+</div>
+<div class="clearfix"></div>
+
+<div class="page_title">知识图谱</div>
+
+  <div class="toc"><span class="toctitle">Table of Contents</span><ul>
+<li><a href="#_1">知识图谱</a><ul>
+<li><a href="#_2">知识图谱的构建</a><ul>
+<li><a href="#_3">知识图谱的数据来源</a><ul>
+<li><a href="#_4">百科类数据</a></li>
+<li><a href="#_5">结构化数据</a></li>
+<li><a href="#_6">搜索日志、网页</a></li>
+</ul>
+</li>
+<li><a href="#_7">从抽取图谱到知识图谱</a><ul>
+<li><a href="#entity-alignment">实体对齐（Entity Alignment)</a></li>
+<li><a href="#_8">知识图谱模式构建</a><ul>
+<li><a href="#_9">本体</a></li>
+<li><a href="#_10">图谱模式</a></li>
+<li><a href="#_11">方法</a></li>
+</ul>
+</li>
+<li><a href="#_12">知识图谱上的挖掘</a></li>
+</ul>
+</li>
+<li><a href="#_13">知识图谱的更新和维护</a><ul>
+<li><a href="#_14">知识图谱模式的更新</a></li>
+<li><a href="#_15">结构化站点包装器的维护</a></li>
+<li><a href="#_16">知识图谱的更新频率</a></li>
+<li><a href="#_17">众包反馈机制</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#_18">知识图谱的应用</a><ul>
+<li><a href="#_19">查询理解</a></li>
+<li><a href="#_20">问题回答</a></li>
+</ul>
+</li>
+<li><a href="#_21">知识图谱的实例</a></li>
+<li><a href="#_22">总结</a></li>
+<li><a href="#_23">说明</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="_1">知识图谱</h1>
+<div class="hlcode"><pre><span class="err">知识图谱，也称为科学知识图谱，它通过将应用数学、图形学、信息可视化技术、信息科学等学科的理论与方法与计量学引文分析、共现分析等方法结合，并利用可视化的图谱形象地展示学科的核心结构、发展历史、前沿领域以及整体知识架构达到多学科融合目的的现代理论。</span>
+</pre></div>
+
+
+<h2 id="_2">知识图谱的构建</h2>
+<h3 id="_3">知识图谱的数据来源</h3>
+<h4 id="_4">百科类数据</h4>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">质量较高</span><span class="p">.</span>
+<span class="mf">2.</span> <span class="err">更新数度慢</span><span class="p">.</span>
+<span class="mf">3.</span> <span class="err">提取实体、属性、关系</span><span class="p">.</span>
+</pre></div>
+
+
+<h4 id="_5">结构化数据</h4>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">方法：构建面向站点的包装器</span><span class="p">.</span>
+<span class="mf">2.</span> <span class="err">质量较高</span><span class="p">.</span>
+<span class="mf">3.</span> <span class="err">更新数度慢</span><span class="p">.</span>
+<span class="mf">4.</span> <span class="err">提取实体、属性、关系，属性部分加强</span><span class="p">.</span>
+</pre></div>
+
+
+<h4 id="_6">搜索日志、网页</h4>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">质量较差</span><span class="p">.</span>
+<span class="mf">2.</span> <span class="err">提高图谱覆盖率</span><span class="p">.</span>
+<span class="mf">3.</span> <span class="err">提取属性</span><span class="p">.</span>
+</pre></div>
+
+
+<h3 id="_7">从抽取图谱到知识图谱</h3>
+<h4 id="entity-alignment">实体对齐（Entity Alignment)</h4>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">目的：发现具有不同标识却代表真实世界中同一对象的那些实体，并将这些实体归并为一个具有全局唯一标识的实体对象，然后添加到知识图谱中</span><span class="p">.</span>
+<span class="mf">2.</span> <span class="err">主要方法：聚类</span>
+    <span class="mf">1.</span> <span class="err">相似度度量规则</span>
+        <span class="mf">1.</span> <span class="err">具有相同描述的实体可能代表同一实体（字符相似）</span><span class="p">.</span>
+        <span class="mf">2.</span> <span class="err">具有相同属性</span><span class="o">-</span><span class="err">值的实体可能代表相同对象（属性相似）</span><span class="p">.</span>
+        <span class="mf">3.</span> <span class="err">具有相同邻居的实体可能指向同一个对象（结构相似）</span><span class="p">.</span>
+    <span class="mf">2.</span> <span class="err">准确率无法保证，需人工审核</span><span class="p">.</span>
+</pre></div>
+
+
+<h4 id="_8">知识图谱模式构建</h4>
+<h5 id="_9">本体</h5>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">概念</span>
+<span class="mf">2.</span> <span class="err">概念层次</span>
+<span class="mf">3.</span> <span class="err">属性</span>
+<span class="mf">4.</span> <span class="err">属性值类型</span>
+<span class="mf">5.</span> <span class="err">关系</span>
+<span class="mf">6.</span> <span class="err">关系定义域概念集</span>
+<span class="mf">7.</span> <span class="err">关系值域概念集</span>
+</pre></div>
+
+
+<h5 id="_10">图谱模式</h5>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">领域（</span><span class="n">domain</span><span class="err">）</span>
+<span class="mf">2.</span> <span class="err">类别（</span><span class="n">type</span><span class="err">）</span>
+<span class="mf">3.</span> <span class="err">主题（</span><span class="n">topic</span><span class="err">，即实体）</span>
+</pre></div>
+
+
+<h5 id="_11">方法</h5>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">自底向上：有利于抽取新的实例，可保证抽取质量</span><span class="p">.</span>
+<span class="mf">2.</span> <span class="err">自顶向下：能发现新的模式</span><span class="p">.</span>
+</pre></div>
+
+
+<h4 id="_12">知识图谱上的挖掘</h4>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">推理：用于发现隐含知识，其功能通过可扩展的规则引擎来完成</span><span class="p">.</span>
+<span class="mf">2.</span> <span class="err">实体重要性排序</span>
+<span class="mf">3.</span> <span class="err">相关实体挖掘：“其他人还搜了”</span><span class="p">.</span>
+</pre></div>
+
+
+<h3 id="_13">知识图谱的更新和维护</h3>
+<h4 id="_14">知识图谱模式的更新</h4>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">目前定义的类别数约为</span><span class="mi">103</span><span class="o">~</span><span class="mi">104</span><span class="err">量级</span><span class="p">.</span>
+<span class="mf">2.</span> <span class="err">由专业的人员进行决策和命名新类别</span><span class="p">.</span>
+</pre></div>
+
+
+<h4 id="_15">结构化站点包装器的维护</h4>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">变化量超过事先设定的阈值且抽取结果与原先标注的答案差别较大，则表明现有的站点包装器失效了</span><span class="p">.</span>
+</pre></div>
+
+
+<h4 id="_16">知识图谱的更新频率</h4>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">规模和更新频度：数据层</span><span class="o">&gt;&gt;</span><span class="err">模式层</span><span class="p">.</span>
+</pre></div>
+
+
+<h4 id="_17">众包反馈机制</h4>
+<h2 id="_18">知识图谱的应用</h2>
+<h3 id="_19">查询理解</h3>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">选择性显示知识卡片</span>
+<span class="mf">2.</span> <span class="err">选择性显示属性</span>
+</pre></div>
+
+
+<h3 id="_20">问题回答</h3>
+<h2 id="_21">知识图谱的实例</h2>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">谷歌知识图谱</span>
+<span class="mf">2.</span> <span class="err">百度</span> <span class="err">“知心”</span>
+<span class="mf">3.</span> <span class="err">搜狗</span> <span class="err">“知立方”</span>
+</pre></div>
+
+
+<h2 id="_22">总结</h2>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">目前知识图谱的发展还处于初期阶段</span><span class="p">.</span>
+<span class="mf">2.</span> <span class="err">人工干预仍起重要作用</span><span class="p">.</span>
+<span class="mf">3.</span> <span class="err">结构化数据在知识图谱的构建中起到决定性作用</span><span class="p">.</span>
+<span class="mf">4.</span> <span class="err">各大搜索引擎公司为了保护知识图谱的质量多半采用成熟的算法</span><span class="p">.</span>
+<span class="mf">5.</span> <span class="err">搜索引擎公司展示知识卡片时比较谨慎</span><span class="p">.</span>
+<span class="mf">6.</span> <span class="err">更复杂的自然语言查询将崭露头角（如谷歌的蜂鸟算法）</span><span class="p">.</span>
+</pre></div>
+
+
+<h2 id="_23">说明</h2>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="err">实体：全局唯一确定的标识符</span>
+<span class="mf">2.</span> <span class="err">属性值对：实体特性</span>
+<span class="mf">3.</span> <span class="err">关系：实体间关联</span>
+</pre></div>
+    </div>
+    <div id="footer">
+      <span>
+        <p>Copyright © 2016 jasonqhjia.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.</p>
+        <p>Site Generated 2016-07-15 00:37:58</p>
+      </span>
+    </div>
+  </body>
+</html>
