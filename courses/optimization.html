@@ -1,0 +1,88 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/tango.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>最优化算法 - Qianghuai Jia's Personal Wiki</title>
+    <meta name="keywords" content="wiki"/>
+    <meta name="description" content="personal wiki about my life and work"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+
+  <body>
+    <div id="container">
+      
+<div id="header">
+  <div class="post-nav"><a href="/wiki/">Home</a>&nbsp;&#187;&nbsp;<a href="/wiki/#courses">courses</a>&nbsp;&#187;&nbsp;最优化算法
+    <span class="updated">Updated&nbsp;
+      2016-07-23 20:35
+    </span></div>
+</div>
+<div class="clearfix"></div>
+
+<div class="page_title">最优化算法</div>
+
+  <div class="toc"><span class="toctitle">Table of Contents</span><ul>
+<li><a href="#_1">最优化算法</a><ul>
+<li><a href="#_2">最速下降法</a><ul>
+<li><a href="#1">1. 定义</a></li>
+<li><a href="#2">2. 为什么负梯度方向是下降最快的方向？</a></li>
+<li><a href="#3">3. 优缺点</a></li>
+<li><a href="#4">4. 为什么“慢”的分析？</a></li>
+<li><a href="#5">5. 参考</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="_1">最优化算法</h1>
+<div class="hlcode"><pre><span class="err">最优化方法主要运用数学方法研究各种系统的优化途径及方案，为决策者提供科学决策的依据，下面将简单介绍几种优化算法：最速下降法、牛顿法、拟牛顿法、共轭梯度法。</span>
+</pre></div>
+
+
+<h2 id="_2">最速下降法</h2>
+<h3 id="1">1. 定义</h3>
+<div class="hlcode"><pre><span class="err">以负梯度方向作为极小化方法的下降方向，就叫做最速下降法。</span>
+</pre></div>
+
+
+<h3 id="2">2. 为什么负梯度方向是下降最快的方向？</h3>
+<div class="hlcode"><pre><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="err">将目标函数$</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="err">$在$</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">}</span><span class="err">$泰勒级数展开，如下所示：</span>
+<span class="err">$$</span> <span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span> <span class="o">+</span> <span class="err">\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})(</span><span class="n">x</span> <span class="o">-</span> <span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span> <span class="o">+</span> <span class="n">o</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span> <span class="err">$$</span>
+<span class="err">其中$</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">}</span><span class="err">$表示滴</span><span class="n">k</span><span class="err">次极值迭代点，$\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="err">$是</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="err">在$</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">}</span><span class="err">$处的偏导，$</span><span class="n">o</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="err">$表示高阶无穷小。</span>
+<span class="p">(</span><span class="n">B</span><span class="p">)</span> <span class="err">将迭代公式$</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">}</span> <span class="o">=</span> <span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">}</span> <span class="o">+</span> <span class="err">\</span><span class="n">alpha_</span><span class="p">{</span><span class="n">k</span><span class="p">}</span><span class="n">p_</span><span class="p">{</span><span class="n">k</span><span class="p">}</span><span class="err">$</span> <span class="p">(</span><span class="err">其中</span><span class="n">p</span><span class="err">是下降方向，有$</span><span class="o">||</span><span class="n">p</span><span class="o">||=</span><span class="mi">1</span><span class="err">$，而$\</span><span class="n">alpha</span><span class="err">$是迭代步长，可以通过</span><span class="n">wolfe</span> <span class="n">condition</span><span class="err">得到</span><span class="p">)</span> <span class="err">带入上式，可得</span>
+<span class="err">$$</span> <span class="n">f</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">}</span> <span class="o">+</span> <span class="p">{</span><span class="err">\</span><span class="n">alpha</span><span class="p">}</span><span class="n">p</span><span class="p">)</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span> <span class="o">+</span> <span class="err">\</span><span class="n">alpha</span><span class="err">\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="n">p</span> <span class="o">+</span> <span class="n">o</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span> <span class="err">$$</span>
+<span class="err">其中为了让$</span><span class="n">f</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">}</span> <span class="o">+</span> <span class="p">{</span><span class="err">\</span><span class="n">alpha</span><span class="p">}</span><span class="n">p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">f</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="err">$，需要满足$\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="n">p</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="err">$</span> <span class="p">(</span><span class="n">o</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="err">高阶无穷小，可以忽略</span><span class="p">)</span><span class="err">。$\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="err">$和</span><span class="n">p</span><span class="err">都是向量，从而满足$\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="n">p</span><span class="err">$是向量内积，因此满足：$\</span><span class="n">cos</span><span class="p">{</span><span class="err">\</span><span class="n">theta</span><span class="p">}</span> <span class="o">=</span> <span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="err">\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="n">p</span><span class="p">}{</span><span class="o">||</span><span class="err">\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="o">||||</span><span class="n">p</span><span class="o">||</span><span class="p">}</span><span class="err">$，众所周知，$</span><span class="o">-</span><span class="mi">1</span> <span class="err">\</span><span class="n">leq</span><span class="err">\</span> <span class="n">cos</span><span class="p">{</span><span class="err">\</span><span class="n">theta</span><span class="p">}</span> <span class="err">\</span><span class="n">leq</span> <span class="mi">1</span><span class="err">$，因此当$</span><span class="n">cos</span><span class="p">{</span><span class="err">\</span><span class="n">theta</span><span class="p">}</span><span class="o">=-</span><span class="mi">1</span><span class="err">$时，$\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="n">p</span><span class="err">$取得最小值。为使等式成立，梯度向量</span><span class="n">p</span><span class="err">需要满足$</span><span class="n">p</span><span class="o">=-</span><span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="err">\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})}{</span><span class="o">||</span><span class="err">\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="o">||</span><span class="p">}</span><span class="err">$，也即负梯度方向，沿着这个方向目标函数值下降最快。</span>
+</pre></div>
+
+
+<h3 id="3">3. 优缺点</h3>
+<div class="hlcode"><pre><span class="o">*</span> <span class="err">优点：程序简单，计算量小；对初始点没有特别的要求；最速下降法是整体收敛的，且为线性收敛。</span>
+<span class="o">*</span> <span class="err">缺点：它只在局部范围内具有“最速”属性，</span> <span class="err">对整体求解过程，它的下降速度是缓慢的。靠近极小值时速度减慢；可能会&#39;之字型&#39;地下降。</span>
+</pre></div>
+
+
+<h3 id="4">4. 为什么“慢”的分析？</h3>
+<div class="hlcode"><pre><span class="err">记$</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">}</span> <span class="o">=</span> <span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">}</span> <span class="o">+</span> <span class="p">{</span><span class="err">\</span><span class="n">alpha</span><span class="p">}</span><span class="n">p</span><span class="err">$，$\</span><span class="n">psi</span><span class="p">(</span><span class="err">\</span><span class="n">alpha</span><span class="p">)</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">}</span> <span class="o">+</span> <span class="p">{</span><span class="err">\</span><span class="n">alpha</span><span class="p">}</span><span class="n">p</span><span class="p">)</span><span class="err">$，在确定$</span><span class="n">p</span><span class="o">=-</span><span class="err">\</span><span class="n">frac</span><span class="p">{</span><span class="err">\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})}{</span><span class="o">||</span><span class="err">\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="o">||</span><span class="p">}</span><span class="err">$后，需要优化$\</span><span class="n">alpha</span><span class="err">$使得$\</span><span class="n">psi</span><span class="p">(</span><span class="err">\</span><span class="n">alpha</span><span class="p">)</span><span class="err">$最小，此时只与参数$\</span><span class="n">alpha</span><span class="err">$有关，由精确</span><span class="n">line</span> <span class="n">search</span><span class="err">方法，可知最优$\</span><span class="n">alpha</span><span class="err">$满足$\</span><span class="n">psi</span><span class="p">(</span><span class="err">\</span><span class="n">alpha</span><span class="p">)</span> <span class="err">＝</span> <span class="mi">0</span><span class="err">$，从而有$\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">})</span><span class="n">p</span><span class="o">=</span><span class="err">\</span><span class="n">nabla</span><span class="o">^</span><span class="n">Tf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">})</span><span class="err">\</span><span class="n">nablaf</span><span class="p">(</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">})</span><span class="o">=</span><span class="mi">0</span><span class="err">$，因此可以看出前后两次搜索方向是相交的。</span>
+<span class="err">最速下降法采用取目标函数的一阶部分（假设函数是线性），从而搜索线性的，每两次相邻搜索方向间是相交的，因而在一定程度导致收敛速度缓慢。</span>
+</pre></div>
+
+
+<h3 id="5">5. 参考</h3>
+<div class="hlcode"><pre><span class="mf">1.</span> <span class="n">http</span><span class="o">:</span><span class="c1">//www.codelast.com/?p=2573  </span>
+<span class="mf">2.</span> <span class="n">http</span><span class="o">:</span><span class="c1">//www.codelast.com/?p=8006</span>
+</pre></div>
+    </div>
+    <div id="footer">
+      <span>
+        <p>Copyright © 2016 jasonqhjia.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.</p>
+        <p>Site Generated 2016-07-23 21:54:10</p>
+      </span>
+    </div>
+  </body>
+</html>
