@@ -6,6 +6,8 @@ date: 2016-07-23 20:35
 
 [TOC]
 
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
 # 最优化算法 #
 	最优化方法主要运用数学方法研究各种系统的优化途径及方案，为决策者提供科学决策的依据，下面将简单介绍几种优化算法：最速下降法、牛顿法、拟牛顿法、共轭梯度法。
 	
