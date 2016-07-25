@@ -1,0 +1,104 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/tango.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>TensorFlow学习 - Qianghuai Jia's Personal Wiki</title>
+    <meta name="keywords" content="wiki"/>
+    <meta name="description" content="personal wiki about my life and work"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+
+  <body>
+    <div id="container">
+      
+<div id="header">
+  <div class="post-nav"><a href="/wiki/">Home</a>&nbsp;&#187;&nbsp;<a href="/wiki/#courses">courses</a>&nbsp;&#187;&nbsp;TensorFlow学习
+    <span class="updated">Updated&nbsp;
+      2016-07-25 23:03
+    </span></div>
+</div>
+<div class="clearfix"></div>
+
+<div class="page_title">TensorFlow学习</div>
+
+  <div class="toc"><span class="toctitle">Table of Contents</span><ul>
+<li><a href="#tensorflow">TensorFlow学习</a><ul>
+<li><a href="#piptensorflow">基于Pip安装TensorFlow</a><ul>
+<li><a href="#pip">安装Pip</a></li>
+<li><a href="#tensorflow_1">安装TensorFlow</a></li>
+<li><a href="#_1">测试</a></li>
+<li><a href="#_2">问题</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="tensorflow">TensorFlow学习</h1>
+<h2 id="piptensorflow">基于Pip安装TensorFlow</h2>
+<h3 id="pip">安装Pip</h3>
+<div class="hlcode"><pre><span class="n">Pip</span><span class="err">是一个</span><span class="n">Python</span><span class="err">的软件包安装与管理工具。</span>
+
+<span class="cp"># Ubuntu/Linux 64-bit</span>
+<span class="err">$</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">python</span><span class="o">-</span><span class="n">pip</span> <span class="n">python</span><span class="o">-</span><span class="n">dev</span>
+
+<span class="cp"># Mac OS X</span>
+<span class="err">$</span> <span class="n">sudo</span> <span class="n">easy_install</span> <span class="n">pip</span>
+</pre></div>
+
+
+<h3 id="tensorflow_1">安装TensorFlow</h3>
+<div class="hlcode"><pre><span class="cp"># Ubuntu/Linux 64-bit, CPU only, Python 2.7:</span>
+<span class="err">$</span> <span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">https</span><span class="o">:</span><span class="c1">//storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl</span>
+
+<span class="cp"># Ubuntu/Linux 64-bit, GPU enabled, Python 2.7. Requires CUDA toolkit 7.5 and CuDNN v4.</span>
+<span class="cp"># For other versions, see &quot;Install from sources&quot; below.</span>
+<span class="err">$</span> <span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">https</span><span class="o">:</span><span class="c1">//storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl</span>
+
+<span class="cp"># Mac OS X, CPU only:</span>
+<span class="err">$</span> <span class="n">sudo</span> <span class="n">easy_install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">six</span>
+<span class="err">$</span> <span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">https</span><span class="o">:</span><span class="c1">//storage.googleapis.com/tensorflow/mac/tensorflow-0.8.0-py2-none-any.whl</span>
+</pre></div>
+
+
+<h3 id="_1">测试</h3>
+<div class="hlcode"><pre><span class="n">localhost</span><span class="o">:</span><span class="n">bin</span> <span class="n">huai$</span> <span class="n">python</span>
+<span class="n">Python</span> <span class="mf">2.7</span><span class="o">.</span><span class="mi">10</span> <span class="o">(</span><span class="k">default</span><span class="o">,</span> <span class="n">Oct</span> <span class="mi">23</span> <span class="mi">2015</span><span class="o">,</span> <span class="mi">19</span><span class="o">:</span><span class="mi">19</span><span class="o">:</span><span class="mi">21</span><span class="o">)</span>
+<span class="o">[</span><span class="n">GCC</span> <span class="mf">4.2</span><span class="o">.</span><span class="mi">1</span> <span class="n">Compatible</span> <span class="n">Apple</span> <span class="n">LLVM</span> <span class="mf">7.0</span><span class="o">.</span><span class="mi">0</span> <span class="o">(</span><span class="n">clang</span><span class="o">-</span><span class="mf">700.0</span><span class="o">.</span><span class="mf">59.5</span><span class="o">)]</span> <span class="n">on</span> <span class="n">darwin</span>
+<span class="n">Type</span> <span class="s2">&quot;help&quot;</span><span class="o">,</span> <span class="s2">&quot;copyright&quot;</span><span class="o">,</span> <span class="s2">&quot;credits&quot;</span> <span class="n">or</span> <span class="s2">&quot;license&quot;</span> <span class="k">for</span> <span class="n">more</span> <span class="n">information</span><span class="o">.</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">import</span> <span class="nn">tensorflow</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">hello</span> <span class="o">=</span> <span class="n">tensorflow</span><span class="o">.</span><span class="na">constant</span><span class="o">(</span><span class="s1">&#39;hello, tensorflow!&#39;</span><span class="o">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sess</span> <span class="o">=</span> <span class="n">tensorflow</span><span class="o">.</span><span class="na">Session</span><span class="o">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">print</span><span class="o">(</span><span class="n">sess</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">hello</span><span class="o">))</span>
+<span class="n">hello</span><span class="o">,</span> <span class="n">tensorflow</span><span class="o">!</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="n">tensorflow</span><span class="o">.</span><span class="na">constant</span><span class="o">(</span><span class="mi">10</span><span class="o">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">tensorflow</span><span class="o">.</span><span class="na">constant</span><span class="o">(</span><span class="mi">32</span><span class="o">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">print</span><span class="o">(</span><span class="n">sess</span><span class="o">.</span><span class="na">run</span><span class="o">(</span><span class="n">a</span><span class="o">+</span><span class="n">b</span><span class="o">))</span>
+<span class="mi">42</span>
+</pre></div>
+
+
+<h3 id="_2">问题</h3>
+<div class="hlcode"><pre><span class="n">Q</span><span class="err">：</span><span class="o">-</span><span class="n">bash</span><span class="o">:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">pip</span><span class="o">:</span> <span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="n">or</span> <span class="n">directory</span>
+<span class="n">A</span><span class="err">：</span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="o">--</span><span class="n">force</span><span class="o">-</span><span class="n">reinstall</span> <span class="n">pip</span>
+
+<span class="n">Q</span><span class="err">：</span><span class="n">module</span> <span class="n">compiled</span> <span class="n">against</span> <span class="n">API</span> <span class="n">version</span> <span class="mh">0xa</span> <span class="n">but</span> <span class="n">this</span> <span class="n">version</span> <span class="n">of</span> <span class="n">numpy</span> <span class="n">is</span> <span class="mh">0x9</span>
+<span class="n">A</span><span class="err">：升级</span><span class="n">numpy</span><span class="err">版本，一种解决方法是通过</span><span class="n">homebrew</span><span class="err">安装</span><span class="n">opencv</span><span class="err">即可，具体如下：</span>
+    <span class="n">brew</span> <span class="n">install</span> <span class="n">python</span>
+    <span class="n">brew</span> <span class="n">tap</span> <span class="n">homebrew</span><span class="o">/</span><span class="n">science</span>
+    <span class="n">brew</span> <span class="n">install</span> <span class="n">opencv</span>
+</pre></div>
+    </div>
+    <div id="footer">
+      <span>
+        <p>Copyright © 2016 jasonqhjia.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.</p>
+        <p>Site Generated 2016-07-25 23:17:55</p>
+      </span>
+    </div>
+  </body>
+</html>
