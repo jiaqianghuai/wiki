@@ -27,11 +27,22 @@
 
   <div class="toc"><span class="toctitle">Table of Contents</span><ul>
 <li><a href="#tensorflow">TensorFlow学习</a><ul>
-<li><a href="#piptensorflow">基于Pip安装TensorFlow</a><ul>
-<li><a href="#pip">安装Pip</a></li>
-<li><a href="#tensorflow_1">安装TensorFlow</a></li>
-<li><a href="#_1">测试</a></li>
-<li><a href="#_2">问题</a></li>
+<li><a href="#1-piptensorflow">1. 基于Pip安装TensorFlow</a><ul>
+<li><a href="#11-pip">1.1 安装Pip</a></li>
+<li><a href="#12-tensorflow">1.2 安装TensorFlow</a></li>
+<li><a href="#13">1.3 测试</a></li>
+<li><a href="#14">1.4 问题</a></li>
+</ul>
+</li>
+<li><a href="#2">2. 基本使用</a><ul>
+<li><a href="#21">2.1 综述</a></li>
+<li><a href="#22">2.2 计算图</a></li>
+<li><a href="#23">2.3 构建图</a></li>
+<li><a href="#24">2.4 在一个会话中启动图</a></li>
+<li><a href="#25">2.5 交互式使用</a></li>
+<li><a href="#26-tensor">2.6 Tensor</a></li>
+<li><a href="#27-fetch">2.7 Fetch</a></li>
+<li><a href="#28-feed">2.8 Feed</a></li>
 </ul>
 </li>
 </ul>
@@ -39,8 +50,8 @@
 </ul>
 </div>
 <h1 id="tensorflow">TensorFlow学习</h1>
-<h2 id="piptensorflow">基于Pip安装TensorFlow</h2>
-<h3 id="pip">安装Pip</h3>
+<h2 id="1-piptensorflow">1. 基于Pip安装TensorFlow</h2>
+<h3 id="11-pip">1.1 安装Pip</h3>
 <div class="hlcode"><pre><span class="n">Pip</span><span class="err">是一个</span><span class="n">Python</span><span class="err">的软件包安装与管理工具。</span>
 
 <span class="cp"># Ubuntu/Linux 64-bit</span>
@@ -51,7 +62,7 @@
 </pre></div>
 
 
-<h3 id="tensorflow_1">安装TensorFlow</h3>
+<h3 id="12-tensorflow">1.2 安装TensorFlow</h3>
 <div class="hlcode"><pre><span class="cp"># Ubuntu/Linux 64-bit, CPU only, Python 2.7:</span>
 <span class="err">$</span> <span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">https</span><span class="o">:</span><span class="c1">//storage.googleapis.com/tensorflow/linux/cpu/tensorflow-0.8.0-cp27-none-linux_x86_64.whl</span>
 
@@ -65,7 +76,7 @@
 </pre></div>
 
 
-<h3 id="_1">测试</h3>
+<h3 id="13">1.3 测试</h3>
 <div class="hlcode"><pre><span class="n">localhost</span><span class="o">:</span><span class="n">bin</span> <span class="n">huai$</span> <span class="n">python</span>
 <span class="n">Python</span> <span class="mf">2.7</span><span class="o">.</span><span class="mi">10</span> <span class="o">(</span><span class="k">default</span><span class="o">,</span> <span class="n">Oct</span> <span class="mi">23</span> <span class="mi">2015</span><span class="o">,</span> <span class="mi">19</span><span class="o">:</span><span class="mi">19</span><span class="o">:</span><span class="mi">21</span><span class="o">)</span>
 <span class="o">[</span><span class="n">GCC</span> <span class="mf">4.2</span><span class="o">.</span><span class="mi">1</span> <span class="n">Compatible</span> <span class="n">Apple</span> <span class="n">LLVM</span> <span class="mf">7.0</span><span class="o">.</span><span class="mi">0</span> <span class="o">(</span><span class="n">clang</span><span class="o">-</span><span class="mf">700.0</span><span class="o">.</span><span class="mf">59.5</span><span class="o">)]</span> <span class="n">on</span> <span class="n">darwin</span>
@@ -82,7 +93,7 @@
 </pre></div>
 
 
-<h3 id="_2">问题</h3>
+<h3 id="14">1.4 问题</h3>
 <div class="hlcode"><pre><span class="n">Q</span><span class="err">：</span><span class="o">-</span><span class="n">bash</span><span class="o">:</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">pip</span><span class="o">:</span> <span class="n">No</span> <span class="n">such</span> <span class="n">file</span> <span class="n">or</span> <span class="n">directory</span>
 <span class="n">A</span><span class="err">：</span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="o">--</span><span class="n">force</span><span class="o">-</span><span class="n">reinstall</span> <span class="n">pip</span>
 
@@ -92,12 +103,122 @@
     <span class="n">brew</span> <span class="n">tap</span> <span class="n">homebrew</span><span class="o">/</span><span class="n">science</span>
     <span class="n">brew</span> <span class="n">install</span> <span class="n">opencv</span>
 </pre></div>
+
+
+<h2 id="2">2. 基本使用</h2>
+<div class="hlcode"><pre><span class="err">使用</span><span class="n">TensorFlow</span><span class="err">，需要明白几点：</span>
+    <span class="mf">1.</span> <span class="err">使用图（</span><span class="n">graph</span><span class="err">）来表示计算任务</span><span class="p">.</span>
+    <span class="mf">2.</span> <span class="err">在会话（</span><span class="n">Session</span><span class="err">）的上下文中执行图</span><span class="p">.</span>
+    <span class="mf">3.</span> <span class="err">使用</span><span class="n">tensor</span><span class="err">表示数据</span><span class="p">.</span>
+    <span class="mf">4.</span> <span class="err">通过变量（</span><span class="n">Variable</span><span class="err">）维护状态</span><span class="p">.</span>
+    <span class="mf">5.</span> <span class="err">使用</span><span class="n">feed</span><span class="err">和</span><span class="n">fetch</span><span class="err">可以为任意的操作</span><span class="p">(</span><span class="n">arbitrary</span> <span class="n">operation</span><span class="p">)</span> <span class="err">赋值或者从其中获取数据</span><span class="p">.</span>
+</pre></div>
+
+
+<h3 id="21">2.1 综述</h3>
+<div class="hlcode"><pre><span class="n">TensorFlow</span><span class="err">是一个编程系统</span><span class="p">,</span> <span class="err">使用图来表示计算任务</span><span class="p">.</span> <span class="err">图中的节点被称之为</span><span class="n">op</span><span class="p">(</span><span class="n">operation</span> <span class="err">的缩写</span><span class="p">).</span> <span class="err">一个</span><span class="n">op</span><span class="err">获得</span><span class="mi">0</span><span class="err">个或多个</span> <span class="n">Tensor</span><span class="p">,</span> <span class="err">执行计算</span><span class="p">,</span> <span class="err">产生</span><span class="mi">0</span><span class="err">个或多个</span><span class="n">Tensor</span><span class="p">.</span> <span class="err">每个</span><span class="n">Tensor</span><span class="err">是一个类型化的多维数组</span><span class="p">.</span> <span class="err">例如</span><span class="p">,</span> <span class="err">你可以将一小组图像集表示为一个四维浮点数数组</span><span class="p">,</span> <span class="err">这四个维度分别是</span> <span class="p">[</span><span class="n">batch</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">channels</span><span class="p">].</span>
+</pre></div>
+
+
+<h3 id="22">2.2 计算图</h3>
+<div class="hlcode"><pre><span class="n">TensorFlow</span><span class="err">程序通常被组织成一个构建阶段和一个执行阶段</span><span class="p">.</span> <span class="err">在构建阶段</span><span class="p">,</span> <span class="n">op</span><span class="err">的执行步骤被描述成一个图</span><span class="p">.</span> <span class="err">在执行阶段</span><span class="p">,</span> <span class="err">使用会话执行执行图中的</span><span class="n">op</span><span class="p">.</span> <span class="err">例如</span><span class="p">,</span> <span class="err">通常在构建阶段创建一个图来表示和训练神经网络</span><span class="p">,</span> <span class="err">然后在执行阶段反复执行图中的训练</span><span class="n">op</span><span class="p">.</span>
+</pre></div>
+
+
+<h3 id="23">2.3 构建图</h3>
+<div class="hlcode"><pre><span class="err">构建图的第一步，是创建</span><span class="n">source</span> <span class="n">op</span><span class="p">,</span> <span class="err">其不需要任何输入，它的输出被传递给其它</span><span class="n">op</span><span class="err">做运算</span><span class="p">.</span> <span class="err">事例如下：</span>
+
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">import</span> <span class="n">tensorflow</span> <span class="n">as</span> <span class="n">tf</span>
+    <span class="err">#</span> <span class="err">创建一个常量</span> <span class="n">op</span><span class="p">,</span> <span class="err">产生一个</span> <span class="mi">1</span><span class="n">x2</span> <span class="err">矩阵</span><span class="p">.</span> <span class="err">这个</span> <span class="n">op</span> <span class="err">被作为一个节点</span><span class="p">,</span> <span class="err">加到默认图中</span><span class="p">.</span>
+    <span class="err">#</span> <span class="err">构造器的返回值代表该常量</span><span class="n">op</span><span class="err">的返回值</span><span class="p">.</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">mx1</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">constant</span><span class="p">([[</span><span class="mf">5.</span><span class="p">,</span><span class="mf">5.</span><span class="p">]])</span>
+    <span class="err">#</span> <span class="err">创建另外一个常量</span><span class="n">op</span><span class="p">,</span> <span class="err">产生一个</span><span class="mi">2</span><span class="n">x1</span><span class="err">矩阵</span><span class="p">.</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">mx2</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">constant</span><span class="p">([[</span><span class="mf">2.</span><span class="p">],[</span><span class="mf">2.</span><span class="p">]])</span>
+    <span class="err">#</span> <span class="err">创建一个矩阵乘法</span><span class="n">matmul</span> <span class="n">op</span><span class="p">,</span> <span class="err">把‘</span><span class="n">mx1</span><span class="err">’和‘</span><span class="n">mx2</span><span class="err">’作为输入，返回值‘</span><span class="n">product</span><span class="err">’代表矩阵乘法的结果</span><span class="p">.</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">product</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">mx1</span><span class="p">,</span> <span class="n">mx2</span><span class="p">)</span>
+</pre></div>
+
+
+<h3 id="24">2.4 在一个会话中启动图</h3>
+<div class="hlcode"><pre><span class="err">构造完后</span><span class="p">,</span> <span class="err">才能启动图</span><span class="p">.</span> <span class="err">启动图的第一步是创建一个</span><span class="n">Session</span><span class="err">对象</span><span class="p">,</span> <span class="err">如果无任何创建参数</span><span class="p">,</span> <span class="err">会话构造器将启动默认图。</span>
+
+    <span class="err">＃</span> <span class="err">启动默认图</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">Session</span><span class="p">()</span>
+    <span class="err">#</span> <span class="err">调用</span><span class="n">sess</span><span class="err">的&#39;</span><span class="n">run</span><span class="p">()</span><span class="err">&#39;方法来执行矩阵乘法</span><span class="n">op</span><span class="p">,</span> <span class="err">传入</span> <span class="err">&#39;</span><span class="n">product</span><span class="err">&#39;</span> <span class="err">作为该方法的参数</span><span class="p">.</span> <span class="err">上面提到</span><span class="p">,</span> <span class="err">&#39;</span><span class="n">product</span><span class="err">&#39;代表了矩阵乘法</span><span class="n">op</span><span class="err">的输出</span><span class="p">,</span> <span class="err">传入它是向方法表明</span><span class="p">,</span> <span class="err">我们希望取回矩阵乘法</span><span class="n">o</span><span class="err">的输出</span><span class="p">.</span> <span class="err">整个执行过程是自动化的</span><span class="p">,</span> <span class="err">会话负责传递</span> <span class="n">op</span> <span class="err">所需的全部输入</span><span class="p">.</span> <span class="n">op</span><span class="err">通常是并发执行的</span><span class="p">.</span>
+    <span class="err">#</span> <span class="err">函数调用&#39;</span><span class="n">run</span><span class="p">(</span><span class="n">product</span><span class="p">)</span><span class="err">&#39;触发了图中三个</span><span class="n">op</span><span class="p">(</span><span class="err">两个常量</span> <span class="n">op</span> <span class="err">和一个矩阵乘法</span><span class="n">op</span><span class="p">)</span><span class="err">的执行</span><span class="p">.</span>
+    <span class="err">#</span> <span class="err">返回值&#39;</span><span class="n">result</span><span class="err">&#39;是一个</span><span class="n">numpy</span> <span class="err">`</span><span class="n">ndarray</span><span class="err">`对象</span><span class="p">.</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">print</span> <span class="n">result</span>
+    <span class="p">[[</span> <span class="mf">20.</span><span class="p">]]</span>
+    <span class="err">#</span>   <span class="err">任务完成</span><span class="p">,</span> <span class="err">关闭会话</span><span class="p">.</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">sess</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="err">除了如上显示调用</span><span class="n">close</span><span class="err">外</span><span class="p">,</span> <span class="err">也可以使用‘</span><span class="n">with</span><span class="err">’代码块来自动完成关闭动作</span><span class="p">.</span>
+
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">Session</span><span class="p">()</span> <span class="n">as</span> <span class="n">sess</span><span class="o">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">product</span><span class="p">)</span>
+                <span class="n">print</span> <span class="n">result</span>
+</pre></div>
+
+
+<h3 id="25">2.5 交互式使用</h3>
+<div class="hlcode"><pre><span class="err">为了便于使用诸如</span><span class="n">IPython</span><span class="err">之类的</span><span class="n">Python</span><span class="err">交互环境</span><span class="p">,</span> <span class="err">可以使用</span> <span class="n">InteractiveSession</span><span class="err">代替</span><span class="n">Session</span><span class="err">类</span><span class="p">,</span> <span class="err">使用</span> <span class="n">Tensor</span><span class="p">.</span><span class="n">eval</span><span class="p">()</span><span class="err">和</span><span class="n">Operation</span><span class="p">.</span><span class="n">run</span><span class="p">()</span><span class="err">方法代替</span> <span class="n">Session</span><span class="p">.</span><span class="n">run</span><span class="p">().</span> <span class="err">这样可以避免使用一个变量来持有会话</span><span class="p">.</span>
+
+    <span class="err">#</span> <span class="err">进入一个交互式</span><span class="n">TensorFlow</span><span class="err">会话</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">InteractiveSession</span><span class="p">()</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">Variable</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">constant</span><span class="p">([</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">])</span>
+  <span class="err">#</span> <span class="err">使用初始化器</span><span class="n">initializer</span> <span class="n">op</span><span class="err">的</span><span class="n">run</span><span class="p">()</span><span class="err">方法初始化</span> <span class="sc">&#39;x&#39;</span>  
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">x</span><span class="p">.</span><span class="n">initializer</span><span class="p">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="err">#</span> <span class="err">增加一个减法</span><span class="n">sub</span> <span class="n">op</span><span class="p">,</span> <span class="err">从</span> <span class="sc">&#39;x&#39;</span> <span class="err">减去</span> <span class="sc">&#39;a&#39;</span><span class="p">.</span> <span class="err">运行减法</span><span class="n">op</span><span class="p">,</span> <span class="err">输出结果</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">sub</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+    <span class="o">&gt;&gt;&gt;</span> <span class="n">print</span> <span class="n">sub</span><span class="p">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="p">[</span><span class="o">-</span><span class="mf">2.</span> <span class="o">-</span><span class="mf">1.</span><span class="p">]</span>
+</pre></div>
+
+
+<h3 id="26-tensor">2.6 Tensor</h3>
+<div class="hlcode"><pre><span class="n">TensorFlow</span><span class="err">程序使用</span><span class="n">tensor</span><span class="err">数据结构来代表所有的数据</span><span class="p">,</span> <span class="err">计算图中</span><span class="p">,</span> <span class="err">操作间传递的数据都是</span><span class="n">tensor</span><span class="p">.</span> <span class="err">你可以把</span><span class="n">TensorFlow</span> <span class="n">tensor</span><span class="err">看作是一个</span><span class="n">n</span><span class="err">维的数组或列表</span><span class="p">.</span> <span class="err">一个</span><span class="n">tensor</span><span class="err">包含一个静态类型</span><span class="n">rank</span><span class="p">,</span> <span class="err">和一个</span><span class="n">shape</span><span class="p">.</span>
+</pre></div>
+
+
+<h3 id="27-fetch">2.7 Fetch</h3>
+<div class="hlcode"><pre><span class="err">为了取回操作的输出内容</span><span class="p">,</span> <span class="err">可以在使用</span><span class="n">Session</span><span class="err">对象的</span><span class="n">run</span><span class="p">()</span><span class="err">调用</span> <span class="err">执行图时</span><span class="p">,</span> <span class="err">传入一些</span><span class="n">tensor</span><span class="p">,</span> <span class="err">这些</span><span class="n">tensor</span><span class="err">会帮助你取回结果</span><span class="p">.</span> <span class="err">在之前的例子里</span><span class="p">,</span> <span class="err">我们只取回了单个节点</span><span class="n">state</span><span class="p">,</span> <span class="err">但是你也可以取回多个</span><span class="n">tensor</span><span class="o">:</span>
+
+    <span class="n">input1</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span>
+    <span class="n">input2</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">input3</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">constant</span><span class="p">(</span><span class="mf">5.0</span><span class="p">)</span>
+    <span class="n">intermed</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">input2</span><span class="p">,</span> <span class="n">input3</span><span class="p">)</span>
+    <span class="n">mul</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">mul</span><span class="p">(</span><span class="n">input1</span><span class="p">,</span> <span class="n">intermed</span><span class="p">)</span>
+
+    <span class="n">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">Session</span><span class="p">()</span> <span class="n">as</span> <span class="n">sess</span><span class="o">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="n">mul</span><span class="p">,</span> <span class="n">intermed</span><span class="p">])</span>
+            <span class="n">print</span> <span class="n">result</span>
+
+            <span class="err">#</span> <span class="err">输出</span><span class="o">:</span>
+            <span class="err">#</span> <span class="p">[</span><span class="n">array</span><span class="p">([</span> <span class="mf">21.</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">),</span> <span class="n">array</span><span class="p">([</span> <span class="mf">7.</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)]</span>
+</pre></div>
+
+
+<h3 id="28-feed">2.8 Feed</h3>
+<div class="hlcode"><pre><span class="n">feed</span><span class="err">使用一个</span><span class="n">tensor</span><span class="err">值临时替换一个操作的输出结果</span><span class="p">.</span> <span class="err">你可以提供</span><span class="n">feed</span><span class="err">数据作为</span><span class="n">run</span><span class="p">()</span> <span class="err">调用的参数</span><span class="p">.</span> <span class="n">feed</span> <span class="err">只在调用它的方法内有效</span><span class="p">,</span> <span class="err">方法结束</span><span class="p">,</span> <span class="n">feed</span> <span class="err">就会消失</span><span class="p">.</span> <span class="err">最常见的用例是将某些特殊的操作指定为</span> <span class="s">&quot;feed&quot;</span> <span class="err">操作</span><span class="p">,</span> <span class="err">标记的方法是使用</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">()</span> <span class="err">为这些操作创建占位符</span><span class="p">.</span>
+
+    <span class="n">input1</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">input2</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">mul</span><span class="p">(</span><span class="n">input1</span><span class="p">,</span> <span class="n">input2</span><span class="p">)</span>
+
+    <span class="n">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">Session</span><span class="p">()</span> <span class="n">as</span> <span class="n">sess</span><span class="o">:</span>
+      <span class="n">print</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="n">output</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">input1</span><span class="o">:</span><span class="p">[</span><span class="mf">7.</span><span class="p">],</span> <span class="n">input2</span><span class="o">:</span><span class="p">[</span><span class="mf">2.</span><span class="p">]})</span>
+
+    <span class="err">#</span> <span class="err">输出</span><span class="o">:</span>
+    <span class="err">#</span> <span class="p">[</span><span class="n">array</span><span class="p">([</span> <span class="mf">14.</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)]</span>
+</pre></div>
     </div>
     <div id="footer">
       <span>
         <p>Copyright © 2016 jasonqhjia.
         Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.</p>
-        <p>Site Generated 2016-07-25 23:17:55</p>
+        <p>Site Generated 2016-07-28 23:22:12</p>
       </span>
     </div>
   </body>
