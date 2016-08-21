@@ -19,8 +19,7 @@ date: 2016-08-21 14:45
 ## PageRank原始模型 ##
   Internet上网页之间的关系可以看成一个有向图，其中网页是结点，如果网页A有链接到网页B，则存在一
   条有向边A->B，下面是一个简单的示例：  
-      A<----->D------>B<-->B
-      |------>C-------^
+      C<-----A<----->D------>B<----->B<-----C
       A C D : A链向C和D
       B B   : B链向自己
       C B   : C链向B
@@ -29,19 +28,17 @@ date: 2016-08-21 14:45
   示A有2条出链。如果一个网页有有k条出链，那么跳转任意一个出链上的概率为1/k。一般用转移矩阵表示
   上网者的跳转概率，如果用n表示网页的数目，则转移矩阵M是一个n*n的方阵，如果网页i有k个出链，那么
   对每一个出链指向网页j，有M[i][j]=1/k，而其他网页的M[i][j]=0。上面示例图对应的转移矩阵M如下：
-                            A   B   C   D
-                           |---------------|
-                          A|0   0  1/2 1/2 |
-                          B|0   1   0   0  |
-                          C|0   1   0   0  |
-                          D|1/2 1/2 0   0  |
-                           |---------------|  
+    *     A   B   C   D
+    *   A|0   0  1/2 1/2 |
+    *   B|0   1   0   0  |
+    *   C|0   1   0   0  |
+    *   D|1/2 1/2 0   0  |
    初始时，假设上网者在每一个网页的概率都是相等的，即1/n，因而初始的概率分布是一个所有值都为1/n
    的n维列向量V0，用V0右乘转移矩阵M，得到第一步游走之后的概率分布V1=MV0。得到V1后，再用V1去右
    乘M等到V2，一直下去，直到V收敛，即Vn＝MV(n-1)。
 
 ## PageRank优化模型 ##
-  ### 问题 ###
+### 问题 ###
     1. 终止点问题
        上述游走行为是一个马尔可夫过程的实例，要满足收敛性，需要满足一个条件，即图是强联通的，即
        从任意网页可以到达其它任意网页。然而Internet上的网页不满足该条件，因而有一些网页不指向
@@ -51,7 +48,7 @@ date: 2016-08-21 14:45
        后，就像跳进了陷阱，再也不能从C中出来，将导致最终概率分布值全部转移到B上来，这使得其它网
        页的概率分布值为0，从而整个网页就失去了意义。
 
-  ### 解决 ###
+### 解决 ###
     上面过程，我们忽略了一个问题，那就是上网者在遇到类似B网页的时候，不会停滞不前，他会在浏览器的
     地址随机输入一个地址，当然这个地址可能是原来的网页，但这里给了他一个逃离陷阱的机会。因此，对算
     法的改进，每一步，上网者都有可能不想看当前网页，不看当前网页当然也不会点击当前页面链接，而是在
@@ -64,24 +61,24 @@ date: 2016-08-21 14:45
   借助Map-Reduce的计算方式来解决。考虑转移矩阵是一个稀疏矩阵，我们可以用稀疏矩阵的形式表示，我
   们把web图中的每一个网页及其链出的网页作为一行，并给每个网页一个初始的pagerank值（一般为均值）
   ，这样上节的web图结构用如下方式表示：
-        A C D
-        B B
-        C B
-        D A B
-        A a 0.25
-        B a 0.25
-        C a 0.25
-        D a 0.25
-  ### Map阶段 ###
+    1. A C D
+    2. B B
+    3. C B
+    4. D A B
+    5. A a 0.25
+    6. B a 0.25
+    7. C a 0.25
+    8. D a 0.25
+### Map阶段 ###
     Map操作的每一行，对所有出链发射当前网页概率值的1/k，k是当前网页的出链数，比如对第一行输出<
     C,0.25*0.5>，<D,0.25*0.5>，其中0.25是当前网页的概率。
 
-  ### Reduce阶段 ###
+### Reduce阶段 ###
     Reduce操作收集id相同的网页得分值，累加并按权重计算，pi＝a*(p1+p2+...+pm)+(1-a)*1/n，
     其中m是指向网页i的网页书，n是所有网页数目。
 
-  ### Python实现 ###
-    %PageRank_mapper.py%
+### Python实现 ###
+    //PageRank_mapper.py
     ''' mapper of pangerank algorithm'''
     import sys
     id1 = id2 = None
@@ -109,7 +106,7 @@ date: 2016-08-21 14:45
             id1 = id2 = None
             count1 = 0
 
-    %PageRank_reducer.py%
+    //PageRank_reducer.py
     '''reducer of pagerank algorithm'''
     import sys
     last = None
@@ -131,8 +128,8 @@ date: 2016-08-21 14:45
         values = alpha * values + (1 - alpha) / N
         print '%s\ta\t%s' % (last,values)
 
-  ### C++实现 ###
-    %PageRank_mapper.cc%
+### C++实现 ###
+    //PageRank_mapper.cc
     void mapper() {
       string line;
       string id1 = "";
@@ -176,7 +173,7 @@ date: 2016-08-21 14:45
        }
     }
 
-    %PageRank_reducer.cc%
+    //PageRank_reducer.cc
     void reducer() {
       string line;
       string last = "";
@@ -211,8 +208,7 @@ date: 2016-08-21 14:45
       }
     }
 
-  ### 在Linux下模仿Map-Reduce过程 ###
-    #!/bin/bash
+### 在Linux下模仿Map-Reduce过程 ###
     for((i=1;i<=40;i++));
     do
     cat link_all | sort -n -k 1 -t \t | python PageRank_mapper.py | sort -n -k 1 -t \t | python PageRank_reducer.py > page_rank_val
