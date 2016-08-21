@@ -1,0 +1,256 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/style.css">
+    <link rel="Stylesheet" type="text/css" href="/wiki/static/css/tango.css">
+    <link rel="shortcut icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/wiki/favicon.ico" type="image/x-icon">
+    <link rel="alternate" type="application/atom+xml" href="atom.xml" title="Atom feed">
+    <title>PageRank算法简介及Map-Reduce实现 - Qianghuai Jia's Personal Wiki</title>
+    <meta name="keywords" content="wiki"/>
+    <meta name="description" content="personal wiki about my life and work"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+
+  <body>
+    <div id="container">
+      
+<div id="header">
+  <div class="post-nav"><a href="/wiki/">Home</a>&nbsp;&#187;&nbsp;<a href="/wiki/#courses">courses</a>&nbsp;&#187;&nbsp;PageRank算法简介及Map-Reduce实现
+    <span class="updated">Updated&nbsp;
+      2016-08-21 14:45
+    </span></div>
+</div>
+<div class="clearfix"></div>
+
+<div class="page_title">PageRank算法简介及Map-Reduce实现</div>
+
+  <div class="toc"><span class="toctitle">Table of Contents</span><ul>
+<li><a href="#_1">导言</a><ul>
+<li><a href="#pagerank">PageRank概念</a></li>
+<li><a href="#pagerank_1">PageRank原始模型</a></li>
+<li><a href="#pagerank_2">PageRank优化模型</a></li>
+<li><a href="#pagerankmap-reduce">PageRank计算：Map-Reduce</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="_1">导言</h1>
+<p>PageRank是对网页进行排序（重要度计算）的一种算法，是由Google创始人拉里佩奇和谢尔盖布林发明
+  创造的。下文我将简单介绍PageRank算法，以及其在分布式环境下的实现方式。</p>
+<h2 id="pagerank">PageRank概念</h2>
+<p>PageRank算法计算每一个网页的得分值，然后根据这个值的大小对网页的重要性进行排序。该算法的思路
+  是随机游走，即模拟一个悠闲的上网者，上网者首先随机选择一个网页打开，然后在这个网页上待了几分钟
+  后，跳转到该网页所指向的链接，这样漫无目的得在网页上跳来跳去，PageRank就是估计这个上网者分布
+  在各个网页上的概率。</p>
+<h2 id="pagerank_1">PageRank原始模型</h2>
+<p>Internet上网页之间的关系可以看成一个有向图，其中网页是结点，如果网页A有链接到网页B，则存在一
+  条有向边A-&gt;B，下面是一个简单的示例：<br />
+      A&lt;-----&gt;D------&gt;B&lt;--&gt;B
+      |------&gt;C-------^
+      A C D : A链向C和D
+      B B   : B链向自己
+      C B   : C链向B
+      D A B : D链向A和B
+  上图这个例子只有四个网页，如果当前在A页面，那么上网者将会各自有1/2的概率跳转到C和D，这里的2表
+  示A有2条出链。如果一个网页有有k条出链，那么跳转任意一个出链上的概率为1/k。一般用转移矩阵表示
+  上网者的跳转概率，如果用n表示网页的数目，则转移矩阵M是一个n*n的方阵，如果网页i有k个出链，那么
+  对每一个出链指向网页j，有M[i][j]=1/k，而其他网页的M[i][j]=0。上面示例图对应的转移矩阵M如下：
+                            A   B   C   D
+                           |---------------|
+                          A|0   0  1/2 1/2 |
+                          B|0   1   0   0  |
+                          C|0   1   0   0  |
+                          D|1/2 1/2 0   0  |
+                           |---------------|<br />
+   初始时，假设上网者在每一个网页的概率都是相等的，即1/n，因而初始的概率分布是一个所有值都为1/n
+   的n维列向量V0，用V0右乘转移矩阵M，得到第一步游走之后的概率分布V1=MV0。得到V1后，再用V1去右
+   乘M等到V2，一直下去，直到V收敛，即Vn＝MV(n-1)。</p>
+<h2 id="pagerank_2">PageRank优化模型</h2>
+<p>### 问题 ###
+    1. 终止点问题
+       上述游走行为是一个马尔可夫过程的实例，要满足收敛性，需要满足一个条件，即图是强联通的，即
+       从任意网页可以到达其它任意网页。然而Internet上的网页不满足该条件，因而有一些网页不指向
+       任何网页，这样造成的结果就是最后得到的概率分布向量所有元素几乎都为0。
+    2. 陷阱问题
+       有些网页不存在指向其它网页的链接，但存在指向自己的链接，比如上图的网页B。上网者跑到B网页
+       后，就像跳进了陷阱，再也不能从C中出来，将导致最终概率分布值全部转移到B上来，这使得其它网
+       页的概率分布值为0，从而整个网页就失去了意义。</p>
+<p>### 解决 ###
+    上面过程，我们忽略了一个问题，那就是上网者在遇到类似B网页的时候，不会停滞不前，他会在浏览器的
+    地址随机输入一个地址，当然这个地址可能是原来的网页，但这里给了他一个逃离陷阱的机会。因此，对算
+    法的改进，每一步，上网者都有可能不想看当前网页，不看当前网页当然也不会点击当前页面链接，而是在
+    浏览器地址栏输入其它网址，而在地址栏输入跳转到其它网页的概率为1/n。假设上网者每一步查看当前网
+    页的概率为a，那么其在浏览器输网址的概率为1-a，因此迭代公式转化为：
+            Vn ＝ aMV(n-1) + (1-a)e, 其中e为所有值为1/n的n维单位列向量。</p>
+<h2 id="pagerankmap-reduce">PageRank计算：Map-Reduce</h2>
+<p>对于互联网上的数以百亿级的网页来说，构成的转移矩阵非常大，直接按矩阵乘法的计算方法不可行，需要
+  借助Map-Reduce的计算方式来解决。考虑转移矩阵是一个稀疏矩阵，我们可以用稀疏矩阵的形式表示，我
+  们把web图中的每一个网页及其链出的网页作为一行，并给每个网页一个初始的pagerank值（一般为均值）
+  ，这样上节的web图结构用如下方式表示：
+        A C D
+        B B
+        C B
+        D A B
+        A a 0.25
+        B a 0.25
+        C a 0.25
+        D a 0.25
+  ### Map阶段 ###
+    Map操作的每一行，对所有出链发射当前网页概率值的1/k，k是当前网页的出链数，比如对第一行输出&lt;
+    C,0.25*0.5&gt;，<D,0.25*0.5>，其中0.25是当前网页的概率。</p>
+<p>### Reduce阶段 ###
+    Reduce操作收集id相同的网页得分值，累加并按权重计算，pi＝a<em>(p1+p2+...+pm)+(1-a)</em>1/n，
+    其中m是指向网页i的网页书，n是所有网页数目。</p>
+<p>### Python实现 ###
+    %PageRank_mapper.py%
+    ''' mapper of pangerank algorithm'''
+    import sys
+    id1 = id2 = None
+    heros = value = None
+    count1 = 0</p>
+<div class="hlcode"><pre><span class="k">for</span> <span class="n">line</span> <span class="n">in</span> <span class="n">sys</span><span class="p">.</span><span class="n">stdin</span><span class="o">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="n">strip</span><span class="p">().</span><span class="n">split</span><span class="p">(</span><span class="sc">&#39;\t&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="n">and</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sc">&#39;a&#39;</span><span class="o">:</span><span class="err">#</span> <span class="n">This</span> <span class="n">is</span> <span class="n">the</span> <span class="n">pangerank</span> <span class="n">value</span>
+        <span class="n">count1</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">count1</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="o">:</span>
+            <span class="n">print</span> <span class="err">&#39;</span><span class="o">%</span><span class="n">s</span><span class="err">\</span><span class="n">t</span><span class="o">%</span><span class="n">s</span><span class="err">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">id1</span><span class="p">,</span><span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="n">id1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="kt">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="nl">else:</span><span class="err">#</span><span class="n">This</span> <span class="n">the</span> <span class="n">link</span> <span class="n">relation</span>
+        <span class="n">id2</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">heros</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">id1</span> <span class="o">==</span> <span class="n">id2</span> <span class="n">and</span> <span class="n">id1</span><span class="o">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">len</span><span class="p">(</span><span class="n">heros</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">value</span> <span class="o">/</span> <span class="n">len</span><span class="p">(</span><span class="n">heros</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">hero</span> <span class="n">in</span> <span class="n">heros</span><span class="o">:</span>
+                <span class="n">print</span> <span class="err">&#39;</span><span class="o">%</span><span class="n">s</span><span class="err">\</span><span class="n">t</span><span class="o">%</span><span class="n">s</span><span class="err">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">hero</span><span class="p">,</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">print</span> <span class="err">&#39;</span><span class="o">%</span><span class="n">s</span><span class="err">\</span><span class="n">t</span><span class="o">%</span><span class="n">s</span><span class="err">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">id1</span><span class="p">,</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">id1</span> <span class="o">=</span> <span class="n">id2</span> <span class="o">=</span> <span class="n">None</span>
+        <span class="n">count1</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="o">%</span><span class="n">PageRank_reducer</span><span class="p">.</span><span class="n">py</span><span class="o">%</span>
+<span class="err">&#39;&#39;&#39;</span><span class="n">reducer</span> <span class="n">of</span> <span class="n">pagerank</span> <span class="n">algorithm</span><span class="err">&#39;&#39;&#39;</span>
+<span class="n">import</span> <span class="n">sys</span>
+<span class="n">last</span> <span class="o">=</span> <span class="n">None</span>
+<span class="n">values</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.85</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">59980157</span><span class="err">#</span> <span class="n">Size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">web</span> <span class="n">pages</span>
+<span class="k">for</span> <span class="n">line</span> <span class="n">in</span> <span class="n">sys</span><span class="p">.</span><span class="n">stdin</span><span class="o">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="n">strip</span><span class="p">().</span><span class="n">split</span><span class="p">(</span><span class="sc">&#39;\t&#39;</span><span class="p">)</span>
+    <span class="n">hero</span><span class="p">,</span><span class="n">value</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="kt">float</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">last</span><span class="o">:</span>
+        <span class="k">if</span> <span class="n">last</span><span class="o">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">values</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span>
+            <span class="n">print</span> <span class="err">&#39;</span><span class="o">%</span><span class="n">s</span><span class="err">\</span><span class="n">ta</span><span class="err">\</span><span class="n">t</span><span class="o">%</span><span class="n">s</span><span class="err">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">last</span><span class="p">,</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">last</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="nl">else:</span>
+        <span class="n">values</span> <span class="o">+=</span> <span class="n">value</span> <span class="err">#</span><span class="n">accumulate</span> <span class="n">the</span> <span class="n">page</span> <span class="n">rank</span> <span class="n">value</span>
+<span class="k">if</span> <span class="n">last</span><span class="o">:</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">values</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span>
+    <span class="n">print</span> <span class="err">&#39;</span><span class="o">%</span><span class="n">s</span><span class="err">\</span><span class="n">ta</span><span class="err">\</span><span class="n">t</span><span class="o">%</span><span class="n">s</span><span class="err">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">last</span><span class="p">,</span><span class="n">values</span><span class="p">)</span>
+</pre></div>
+
+
+<p>### C++实现 ###
+    %PageRank_mapper.cc%
+    void mapper() {
+      string line;
+      string id1 = "";
+      string id2 = "";
+      double value = 0.0;
+      int count1 = 0;
+      vector<string> heros;
+      while(getline(cin,line)){
+          StringTrim(&amp;line);
+          vector<string> info;
+          SplitStringKeepEmpty(line,"\t",&amp;info);
+          if(info.size() &lt;= 1) continue;
+          if(info.size() == 3 &amp;&amp; info[1] == "a") { // This is the pangerank value
+              count1 += 1;
+              if(count1 &gt;= 2) {
+                  cout &lt;&lt; id1 &lt;&lt; "\t" &lt;&lt; "0.0" &lt;&lt; endl;
+              }
+              id1 = info[0];
+              value = atof(info[2].c_str());
+          } else { // This the link relation
+              id2 = info[0];
+              heros.clear();
+              for (size_t i = 1; i &lt; info.size(); i++) {
+                  heros.push_back(info[i]);
+              }
+          }</p>
+<div class="hlcode"><pre>      <span class="k">if</span> <span class="p">(</span><span class="nx">id1</span> <span class="o">==</span> <span class="nx">id2</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">id1.empty</span><span class="p">())</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span><span class="nx">heros.size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+              <span class="nx">double</span> <span class="n">v</span> <span class="o">=</span> <span class="nb">value</span> <span class="o">/</span> <span class="nx">heros.size</span><span class="p">();</span>
+              <span class="nb">for</span> <span class="p">(</span><span class="nx">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">heros.size</span><span class="p">();</span> <span class="nx">i</span><span class="o">++</span><span class="p">){</span>
+                  <span class="nx">cout</span> <span class="o">&lt;&lt;</span> <span class="nx">heros</span><span class="err">[</span><span class="nx">i</span><span class="cp">]</span> <span class="err">&lt;&lt;</span> &quot;\t&quot; <span class="err">&lt;</span><span class="nt">&lt; NumberToString</span><span class="err">(</span><span class="na">v</span><span class="err">)</span> <span class="err">&lt;&lt;</span> <span class="na">endl</span><span class="err">;</span>
+              <span class="err">}</span>
+          <span class="err">}</span>
+
+          <span class="na">cout</span> <span class="err">&lt;&lt;</span> <span class="na">id1</span> <span class="err">&lt;&lt;</span> <span class="err">&quot;\</span><span class="na">t</span><span class="err">&quot;</span> <span class="err">&lt;&lt;</span> <span class="err">&quot;</span><span class="na">0</span><span class="err">.</span><span class="na">0</span><span class="err">&quot;</span> <span class="err">&lt;&lt;</span> <span class="na">endl</span><span class="err">;</span>
+          <span class="na">id1 =</span><span class="err"> </span><span class="s">&quot;&quot;</span><span class="err">;</span>
+          <span class="na">id2 =</span><span class="err"> </span><span class="s">&quot;&quot;</span><span class="err">;</span>
+          <span class="na">count1 =</span><span class="err"> </span><span class="s">0;</span>
+      <span class="err">}</span>
+   <span class="err">}</span>
+<span class="err">}</span>
+
+<span class="err">%</span><span class="na">PageRank_reducer</span><span class="err">.</span><span class="na">cc</span><span class="err">%</span>
+<span class="na">void</span> <span class="na">reducer</span><span class="err">()</span> <span class="err">{</span>
+  <span class="na">string</span> <span class="na">line</span><span class="err">;</span>
+  <span class="na">string</span> <span class="na">last =</span><span class="err"> </span><span class="s">&quot;&quot;</span><span class="err">;</span>
+  <span class="na">double</span> <span class="na">values =</span><span class="err"> </span><span class="s">0.0;</span>
+  <span class="na">double</span> <span class="na">alpha =</span><span class="err"> </span><span class="s">0.85;</span>
+  <span class="na">int</span> <span class="na">N =</span><span class="err"> </span><span class="s">59980157;</span> <span class="err">//</span>  <span class="na">Size</span> <span class="na">of</span> <span class="na">the</span> <span class="na">entities</span>
+  <span class="na">while</span><span class="err">(</span><span class="na">getline</span><span class="err">(</span><span class="na">cin</span><span class="err">,</span><span class="na">line</span><span class="err">)){</span>
+      <span class="na">StringTrim</span><span class="err">(&amp;</span><span class="na">line</span><span class="err">);</span>
+      <span class="na">vector</span><span class="err">&lt;</span><span class="na">string</span><span class="nt">&gt;</span> info;
+      SplitStringKeepEmpty(line,&quot;\t&quot;,<span class="ni">&amp;info);</span>
+      if(info.size() <span class="nt">&lt; 2</span><span class="err">)</span> <span class="na">continue</span><span class="err">;</span>
+      <span class="na">string</span> <span class="na">hero =</span><span class="err"> </span><span class="s">info</span><span class="cp">[</span><span class="mi">0</span><span class="cp">]</span><span class="s">;</span>
+      <span class="na">StringTrim</span><span class="err">(&amp;</span><span class="na">hero</span><span class="err">);</span>
+      <span class="na">string</span> <span class="na">value_str =</span><span class="err"> </span><span class="s">info</span><span class="cp">[</span><span class="mi">1</span><span class="cp">]</span><span class="s">;</span>
+      <span class="na">StringTrim</span><span class="err">(&amp;</span><span class="na">value_str</span><span class="err">);</span>
+      <span class="na">double</span> <span class="na">value =</span><span class="err"> </span><span class="s">atof(value_str.c_str());</span>
+      <span class="na">if</span><span class="err">(</span><span class="na">hero</span> <span class="err">!=</span> <span class="na">last</span><span class="err">)</span> <span class="err">{</span>
+          <span class="na">if</span> <span class="err">(!</span><span class="na">last</span><span class="err">.</span><span class="na">empty</span><span class="err">()){</span>
+              <span class="na">values =</span><span class="err"> </span><span class="s">alpha</span> <span class="err">*</span> <span class="na">values</span> <span class="err">+</span> <span class="err">(</span><span class="na">1</span> <span class="na">-</span> <span class="na">alpha</span><span class="err">)</span> <span class="err">/</span> <span class="na">N</span><span class="err">;</span>
+              <span class="na">cout</span> <span class="err">&lt;&lt;</span> <span class="na">last</span> <span class="err">&lt;&lt;</span> <span class="err">&quot;\</span><span class="na">t</span><span class="err">&quot;</span> <span class="err">&lt;&lt;</span> <span class="err">&quot;</span><span class="na">a</span><span class="err">&quot;</span> <span class="err">&lt;&lt;</span> <span class="err">&quot;\</span><span class="na">t</span><span class="err">&quot;</span>  <span class="err">&lt;&lt;</span> <span class="na">NumberToString</span><span class="err">(</span><span class="na">values</span><span class="err">)</span> <span class="err">&lt;&lt;</span> <span class="na">endl</span><span class="err">;</span>
+          <span class="err">}</span>
+          <span class="na">last =</span><span class="err"> </span><span class="s">hero;</span>
+          <span class="na">values =</span><span class="err"> </span><span class="s">value;</span>
+      <span class="err">}</span> <span class="na">else</span> <span class="err">{</span>
+          <span class="na">values</span> <span class="err">+=</span> <span class="na">value</span><span class="err">;</span> <span class="err">//</span> <span class="na">accumulate</span> <span class="na">the</span> <span class="na">page</span> <span class="na">rank</span> <span class="na">value</span>
+      <span class="err">}</span>
+  <span class="err">}</span>
+
+  <span class="na">if</span><span class="err">(!</span><span class="na">last</span><span class="err">.</span><span class="na">empty</span><span class="err">())</span> <span class="err">{</span>
+      <span class="na">values =</span><span class="err"> </span><span class="s">alpha</span> <span class="err">*</span> <span class="na">values</span> <span class="err">+</span> <span class="err">(</span><span class="na">1</span> <span class="na">-</span> <span class="na">alpha</span><span class="err">)</span> <span class="err">/</span> <span class="na">N</span><span class="err">;</span>
+      <span class="na">cout</span> <span class="err">&lt;&lt;</span> <span class="na">last</span> <span class="err">&lt;&lt;</span> <span class="err">&quot;\</span><span class="na">t</span><span class="err">&quot;</span> <span class="err">&lt;&lt;</span> <span class="err">&quot;</span><span class="na">a</span><span class="err">&quot;</span> <span class="err">&lt;&lt;</span> <span class="err">&quot;\</span><span class="na">t</span><span class="err">&quot;</span> <span class="err">&lt;&lt;</span> <span class="na">NumberToString</span><span class="err">(</span><span class="na">values</span><span class="err">)</span> <span class="err">&lt;&lt;</span> <span class="na">endl</span><span class="err">;</span>
+  <span class="err">}</span>
+<span class="err">}</span>
+</pre></div>
+
+
+<p>### 在Linux下模仿Map-Reduce过程 ###
+    #!/bin/bash
+    for((i=1;i&lt;=40;i++));
+    do
+    cat link_all | sort -n -k 1 -t \t | python PageRank_mapper.py | sort -n -k 1 -t \t | python PageRank_reducer.py &gt; page_rank_val
+    done</p>
+<div class="hlcode"><pre><span class="nl">ps:</span> <span class="err">用</span><span class="n">python</span><span class="err">或者</span><span class="n">c</span><span class="o">++</span><span class="err">调用</span><span class="n">hadoop</span><span class="err">的</span><span class="n">streaming</span><span class="err">，</span><span class="n">pagerank</span><span class="err">过程就能</span><span class="n">run</span><span class="err">了。有关</span><span class="n">hadoop</span> <span class="n">streaming</span><span class="err">的教程可参考“董的博客</span><span class="o">&gt;&gt;</span><span class="n">Hadoop</span> <span class="n">Streaming</span><span class="err">编程”</span>
+<span class="nl">http:</span><span class="c1">//dongxicheng.org/mapreduce/hadoop-streaming-programming/。</span>
+</pre></div>
+    </div>
+    <div id="footer">
+      <span>
+        <p>Copyright © 2016 jasonqhjia.
+        Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.</p>
+        <p>Site Generated 2016-08-21 19:34:37</p>
+      </span>
+    </div>
+  </body>
+</html>
