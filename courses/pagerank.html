@@ -61,26 +61,27 @@
 
 
 <h2 id="pagerank_1">PageRank原始模型</h2>
-<p>Internet上网页之间的关系可以看成一个有向图，其中网页是结点，如果网页A有链接到网页B，则存在一
-  条有向边A-&gt;B，下面是一个简单的示例：<br />
-    1. C&lt;-----A&lt;-----&gt;D------&gt;B&lt;-----&gt;B&lt;-----C
-    2. A C D : A链向C和D
-    3. B B   : B链向自己
-    4. C B   : C链向B
-    5. D A B : D链向A和B</p>
-<div class="hlcode"><pre><span class="err">上图这个例子只有四个网页，如果当前在</span><span class="n">A</span><span class="err">页面，那么上网者将会各自有</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="err">的概率跳转到</span><span class="n">C</span><span class="err">和</span><span class="n">D</span><span class="err">，这里的</span><span class="mi">2</span><span class="err">表</span>
-<span class="err">示</span><span class="n">A</span><span class="err">有</span><span class="mi">2</span><span class="err">条出链。如果一个网页有有</span><span class="n">k</span><span class="err">条出链，那么跳转任意一个出链上的概率为</span><span class="mi">1</span><span class="o">/</span><span class="n">k</span><span class="err">。一般用转移矩阵表示</span>
-<span class="err">上网者的跳转概率，如果用</span><span class="n">n</span><span class="err">表示网页的数目，则转移矩阵</span><span class="n">M</span><span class="err">是一个</span><span class="n">n</span><span class="o">*</span><span class="n">n</span><span class="err">的方阵，如果网页</span><span class="n">i</span><span class="err">有</span><span class="n">k</span><span class="err">个出链，那么</span>
-<span class="err">对每一个出链指向网页</span><span class="n">j</span><span class="err">，有</span><span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">k</span><span class="err">，而其他网页的</span><span class="n">M</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span><span class="err">。上面示例图对应的转移矩阵</span><span class="n">M</span><span class="err">如下：</span>
-<span class="o">*</span>     <span class="n">A</span>   <span class="n">B</span>   <span class="n">C</span>   <span class="n">D</span>
-<span class="o">*</span>   <span class="n">A</span><span class="o">|</span><span class="mi">0</span>   <span class="mi">0</span>  <span class="mi">1</span><span class="o">/</span><span class="mi">2</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span> <span class="o">|</span>
-<span class="o">*</span>   <span class="n">B</span><span class="o">|</span><span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>  <span class="o">|</span>
-<span class="o">*</span>   <span class="n">C</span><span class="o">|</span><span class="mi">0</span>   <span class="mi">1</span>   <span class="mi">0</span>   <span class="mi">0</span>  <span class="o">|</span>
-<span class="o">*</span>   <span class="n">D</span><span class="o">|</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span> <span class="mi">0</span>   <span class="mi">0</span>  <span class="o">|</span>
+<div class="hlcode"><pre>Internet上网页之间的关系可以看成一个有向图，其中网页是结点，如果网页A有链接到网页B，则存在一
+条有向边A<span class="o">-&gt;</span>B，下面是一个简单的示例：  
+  <span class="o">*</span> C<span class="o">&lt;-----</span>A<span class="o">&lt;-----&gt;</span>D<span class="o">------&gt;</span>B<span class="o">&lt;-----&gt;</span>B<span class="o">&lt;-----</span>C
+  <span class="m">1</span>. A C D <span class="o">:</span> A链向C和D
+  <span class="m">2</span>. B B   <span class="o">:</span> B链向自己
+  <span class="m">3</span>. C B   <span class="o">:</span> C链向B
+  <span class="m">4</span>. D A B <span class="o">:</span> D链向A和B
 
- <span class="err">初始时，假设上网者在每一个网页的概率都是相等的，即</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="err">，因而初始的概率分布是一个所有值都为</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span>
- <span class="err">的</span><span class="n">n</span><span class="err">维列向量</span><span class="n">V0</span><span class="err">，用</span><span class="n">V0</span><span class="err">右乘转移矩阵</span><span class="n">M</span><span class="err">，得到第一步游走之后的概率分布</span><span class="n">V1</span><span class="o">=</span><span class="n">MV0</span><span class="err">。得到</span><span class="n">V1</span><span class="err">后，再用</span><span class="n">V1</span><span class="err">去右</span>
- <span class="err">乘</span><span class="n">M</span><span class="err">等到</span><span class="n">V2</span><span class="err">，一直下去，直到</span><span class="n">V</span><span class="err">收敛，即</span><span class="n">Vn</span><span class="err">＝</span><span class="n">MV</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="err">。</span>
+上图这个例子只有四个网页，如果当前在A页面，那么上网者将会各自有<span class="m">1</span><span class="o">/</span><span class="m">2</span>的概率跳转到C和D，这里的<span class="m">2</span>表
+示A有<span class="m">2</span>条出链。如果一个网页有有k条出链，那么跳转任意一个出链上的概率为<span class="m">1</span><span class="o">/</span>k。一般用转移矩阵表示
+上网者的跳转概率，如果用n表示网页的数目，则转移矩阵M是一个n<span class="o">*</span>n的方阵，如果网页i有k个出链，那么
+对每一个出链指向网页j，有M<span class="p">[</span>i<span class="p">][</span>j<span class="p">]</span><span class="o">=</span><span class="m">1</span><span class="o">/</span>k，而其他网页的M<span class="p">[</span>i<span class="p">][</span>j<span class="p">]</span><span class="o">=</span><span class="m">0</span>。上面示例图对应的转移矩阵M如下：
+<span class="o">*</span>     A   B   C   D
+<span class="o">*</span>   A<span class="o">|</span><span class="m">0</span>   <span class="m">0</span>  <span class="m">1</span><span class="o">/</span><span class="m">2</span> <span class="m">1</span><span class="o">/</span><span class="m">2</span> <span class="o">|</span>
+<span class="o">*</span>   B<span class="o">|</span><span class="m">0</span>   <span class="m">1</span>   <span class="m">0</span>   <span class="m">0</span>  <span class="o">|</span>
+<span class="o">*</span>   C<span class="o">|</span><span class="m">0</span>   <span class="m">1</span>   <span class="m">0</span>   <span class="m">0</span>  <span class="o">|</span>
+<span class="o">*</span>   D<span class="o">|</span><span class="m">1</span><span class="o">/</span><span class="m">2</span> <span class="m">1</span><span class="o">/</span><span class="m">2</span> <span class="m">0</span>   <span class="m">0</span>  <span class="o">|</span>
+
+ 初始时，假设上网者在每一个网页的概率都是相等的，即<span class="m">1</span><span class="o">/</span>n，因而初始的概率分布是一个所有值都为<span class="m">1</span><span class="o">/</span>n
+ 的n维列向量V0，用V0右乘转移矩阵M，得到第一步游走之后的概率分布V1<span class="o">=</span>MV0。得到V1后，再用V1去右
+ 乘M等到V2，一直下去，直到V收敛，即Vn＝MV<span class="p">(</span>n<span class="m">-1</span><span class="p">)</span>。
 </pre></div>
 
 
@@ -283,7 +284,7 @@
       <span>
         <p>Copyright © 2016 jasonqhjia.
         Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.</p>
-        <p>Site Generated 2016-08-21 19:55:14</p>
+        <p>Site Generated 2016-08-21 19:58:26</p>
       </span>
     </div>
   </body>
