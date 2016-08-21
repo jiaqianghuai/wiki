@@ -47,71 +47,51 @@
 </ul>
 </div>
 <h1 id="_1">导言</h1>
-<div class="hlcode"><pre><span class="n">PageRank</span><span class="err">是对网页进行排序（重要度计算）的一种算法，是由</span><span class="n">Google</span><span class="err">创始人拉里佩奇和谢尔盖布林发明</span>
-<span class="err">创造的。下文我将简单介绍</span><span class="n">PageRank</span><span class="err">算法，以及其在分布式环境下的实现方式。</span>
+<div class="hlcode"><pre><span class="n">PageRank</span><span class="err">是对网页进行排序（重要度计算）的一种算法，是由</span><span class="n">Google</span><span class="err">创始人拉里佩奇和谢尔盖布林发明创造的。下文我将简单介绍</span><span class="n">PageRank</span><span class="err">算法，以及其在分布式环境下的实现方式。</span>
 </pre></div>
 
 
 <h2 id="pagerank">PageRank概念</h2>
-<div class="hlcode"><pre><span class="n">PageRank</span><span class="err">算法计算每一个网页的得分值，然后根据这个值的大小对网页的重要性进行排序。该算法的思路</span>
-<span class="err">是随机游走，即模拟一个悠闲的上网者，上网者首先随机选择一个网页打开，然后在这个网页上待了几分钟</span>
-<span class="err">后，跳转到该网页所指向的链接，这样漫无目的得在网页上跳来跳去，</span><span class="n">PageRank</span><span class="err">就是估计这个上网者分布</span>
-<span class="err">在各个网页上的概率。</span>
+<div class="hlcode"><pre><span class="n">PageRank</span><span class="err">算法计算每一个网页的得分值，然后根据这个值的大小对网页的重要性进行排序。该算法的思路是随机游走，即模拟一个悠闲的上网者，上网者首先随机选择一个网页打开，然后在这个网页上待了几分钟后，跳转到该网页所指向的链接，这样漫无目的得在网页上跳来跳去，</span><span class="n">PageRank</span><span class="err">就是估计这个上网者分布在各个网页上的概率。</span>
 </pre></div>
 
 
 <h2 id="pagerank_1">PageRank原始模型</h2>
-<div class="hlcode"><pre>Internet上网页之间的关系可以看成一个有向图，其中网页是结点，如果网页A有链接到网页B，则存在一
-条有向边A<span class="o">-&gt;</span>B，下面是一个简单的示例：  
+<div class="hlcode"><pre>Internet上网页之间的关系可以看成一个有向图，其中网页是结点，如果网页A有链接到网页B，则存在一条有向边A<span class="o">-&gt;</span>B，下面是一个简单的示例：  
   <span class="o">*</span> C<span class="o">&lt;-----</span>A<span class="o">&lt;-----&gt;</span>D<span class="o">------&gt;</span>B<span class="o">&lt;-----&gt;</span>B<span class="o">&lt;-----</span>C
   <span class="m">1</span>. A C D <span class="o">:</span> A链向C和D
   <span class="m">2</span>. B B   <span class="o">:</span> B链向自己
   <span class="m">3</span>. C B   <span class="o">:</span> C链向B
   <span class="m">4</span>. D A B <span class="o">:</span> D链向A和B
 
-上图这个例子只有四个网页，如果当前在A页面，那么上网者将会各自有<span class="m">1</span><span class="o">/</span><span class="m">2</span>的概率跳转到C和D，这里的<span class="m">2</span>表
-示A有<span class="m">2</span>条出链。如果一个网页有有k条出链，那么跳转任意一个出链上的概率为<span class="m">1</span><span class="o">/</span>k。一般用转移矩阵表示
-上网者的跳转概率，如果用n表示网页的数目，则转移矩阵M是一个n<span class="o">*</span>n的方阵，如果网页i有k个出链，那么
-对每一个出链指向网页j，有M<span class="p">[</span>i<span class="p">][</span>j<span class="p">]</span><span class="o">=</span><span class="m">1</span><span class="o">/</span>k，而其他网页的M<span class="p">[</span>i<span class="p">][</span>j<span class="p">]</span><span class="o">=</span><span class="m">0</span>。上面示例图对应的转移矩阵M如下：
+上图这个例子只有四个网页，如果当前在A页面，那么上网者将会各自有<span class="m">1</span><span class="o">/</span><span class="m">2</span>的概率跳转到C和D，这里的<span class="m">2</span>表示A有<span class="m">2</span>条出链。如果一个网页有有k条出链，那么跳转任意一个出链上的概率为<span class="m">1</span><span class="o">/</span>k。一般用转移矩阵表示上网者的跳转概率，如果用n表示网页的数目，则转移矩阵M是一个n<span class="o">*</span>n的方阵，如果网页i有k个出链，那么对每一个出链指向网页j，有M<span class="p">[</span>i<span class="p">][</span>j<span class="p">]</span><span class="o">=</span><span class="m">1</span><span class="o">/</span>k，而其他网页的M<span class="p">[</span>i<span class="p">][</span>j<span class="p">]</span><span class="o">=</span><span class="m">0</span>。上面示例图对应的转移矩阵M如下：
 <span class="o">*</span>     A   B   C   D
 <span class="o">*</span>   A<span class="o">|</span><span class="m">0</span>   <span class="m">0</span>  <span class="m">1</span><span class="o">/</span><span class="m">2</span> <span class="m">1</span><span class="o">/</span><span class="m">2</span> <span class="o">|</span>
 <span class="o">*</span>   B<span class="o">|</span><span class="m">0</span>   <span class="m">1</span>   <span class="m">0</span>   <span class="m">0</span>  <span class="o">|</span>
 <span class="o">*</span>   C<span class="o">|</span><span class="m">0</span>   <span class="m">1</span>   <span class="m">0</span>   <span class="m">0</span>  <span class="o">|</span>
 <span class="o">*</span>   D<span class="o">|</span><span class="m">1</span><span class="o">/</span><span class="m">2</span> <span class="m">1</span><span class="o">/</span><span class="m">2</span> <span class="m">0</span>   <span class="m">0</span>  <span class="o">|</span>
 
- 初始时，假设上网者在每一个网页的概率都是相等的，即<span class="m">1</span><span class="o">/</span>n，因而初始的概率分布是一个所有值都为<span class="m">1</span><span class="o">/</span>n
- 的n维列向量V0，用V0右乘转移矩阵M，得到第一步游走之后的概率分布V1<span class="o">=</span>MV0。得到V1后，再用V1去右
- 乘M等到V2，一直下去，直到V收敛，即Vn＝MV<span class="p">(</span>n<span class="m">-1</span><span class="p">)</span>。
+ 初始时，假设上网者在每一个网页的概率都是相等的，即<span class="m">1</span><span class="o">/</span>n，因而初始的概率分布是一个所有值都为<span class="m">1</span><span class="o">/</span>n的n维列向量V0，用V0右乘转移矩阵M，得到第一步游走之后的概率分布V1<span class="o">=</span>MV0。得到V1后，再用V1去右乘M等到V2，一直下去，直到V收敛，即Vn＝MV<span class="p">(</span>n<span class="m">-1</span><span class="p">)</span>。
 </pre></div>
 
 
 <h2 id="pagerank_2">PageRank优化模型</h2>
 <h3 id="_2">问题</h3>
 <div class="hlcode"><pre><span class="mf">1.</span> <span class="err">终止点问题</span>
-   <span class="err">上述游走行为是一个马尔可夫过程的实例，要满足收敛性，需要满足一个条件，即图是强联通的，即</span>
-   <span class="err">从任意网页可以到达其它任意网页。然而</span><span class="n">Internet</span><span class="err">上的网页不满足该条件，因而有一些网页不指向</span>
-   <span class="err">任何网页，这样造成的结果就是最后得到的概率分布向量所有元素几乎都为</span><span class="mi">0</span><span class="err">。</span>
+   <span class="err">上述游走行为是一个马尔可夫过程的实例，要满足收敛性，需要满足一个条件，即图是强联通的，即从任意网页可以到达其它任意网页。然而</span><span class="n">Internet</span><span class="err">上的网页不满足该条件，因而有一些网页不指向任何网页，这样造成的结果就是最后得到的概率分布向量所有元素几乎都为</span><span class="mi">0</span><span class="err">。</span>
 <span class="mf">2.</span> <span class="err">陷阱问题</span>
-   <span class="err">有些网页不存在指向其它网页的链接，但存在指向自己的链接，比如上图的网页</span><span class="n">B</span><span class="err">。上网者跑到</span><span class="n">B</span><span class="err">网页</span>
-   <span class="err">后，就像跳进了陷阱，再也不能从</span><span class="n">C</span><span class="err">中出来，将导致最终概率分布值全部转移到</span><span class="n">B</span><span class="err">上来，这使得其它网</span>
-   <span class="err">页的概率分布值为</span><span class="mi">0</span><span class="err">，从而整个网页就失去了意义。</span>
+   <span class="err">有些网页不存在指向其它网页的链接，但存在指向自己的链接，比如上图的网页</span><span class="n">B</span><span class="err">。上网者跑到</span><span class="n">B</span><span class="err">网页后，就像跳进了陷阱，再也不能从</span><span class="n">C</span><span class="err">中出来，将导致最终概率分布值全部转移到</span><span class="n">B</span><span class="err">上来，这使得其它网页的概率分布值为</span><span class="mi">0</span><span class="err">，从而整个网页就失去了意义。</span>
 </pre></div>
 
 
 <h3 id="_3">解决</h3>
-<div class="hlcode"><pre><span class="err">上面过程，我们忽略了一个问题，那就是上网者在遇到类似</span><span class="n">B</span><span class="err">网页的时候，不会停滞不前，他会在浏览器的</span>
-<span class="err">地址随机输入一个地址，当然这个地址可能是原来的网页，但这里给了他一个逃离陷阱的机会。因此，对算</span>
-<span class="err">法的改进，每一步，上网者都有可能不想看当前网页，不看当前网页当然也不会点击当前页面链接，而是在</span>
-<span class="err">浏览器地址栏输入其它网址，而在地址栏输入跳转到其它网页的概率为</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="err">。假设上网者每一步查看当前网</span>
-<span class="err">页的概率为</span><span class="n">a</span><span class="err">，那么其在浏览器输网址的概率为</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="err">，因此迭代公式转化为：</span>
-        <span class="n">Vn</span> <span class="err">＝</span> <span class="n">aMV</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="n">e</span><span class="p">,</span> <span class="err">其中</span><span class="n">e</span><span class="err">为所有值为</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="err">的</span><span class="n">n</span><span class="err">维单位列向量。</span>
+<div class="hlcode"><pre><span class="err">上面过程，我们忽略了一个问题，那就是上网者在遇到类似</span><span class="n">B</span><span class="err">网页的时候，不会停滞不前，他会在浏览器的地址随机输入一个地址，当然这个地址可能是原来的网页，但这里给了他一个逃离陷阱的机会。因此，对算法的改进，每一步，上网者都有可能不想看当前网页，不看当前网页当然也不会点击当前页面链接，而是在浏览器地址栏输入其它网址，而在地址栏输入跳转到其它网页的概率为</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="err">。假设上网者每一步查看当前网页的概率为</span><span class="n">a</span><span class="err">，那么其在浏览器输网址的概率为</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="err">，因此迭代公式转化为：</span>
+  <span class="n">Vn</span> <span class="err">＝</span> <span class="n">aMV</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="n">e</span><span class="p">,</span> <span class="err">其中</span><span class="n">e</span><span class="err">为所有值为</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="err">的</span><span class="n">n</span><span class="err">维单位列向量。</span>
 </pre></div>
 
 
 <h2 id="pagerankmap-reduce">PageRank计算：Map-Reduce</h2>
-<div class="hlcode"><pre><span class="err">对于互联网上的数以百亿级的网页来说，构成的转移矩阵非常大，直接按矩阵乘法的计算方法不可行，需要</span>
-<span class="err">借助</span><span class="n">Map</span><span class="o">-</span><span class="n">Reduce</span><span class="err">的计算方式来解决。考虑转移矩阵是一个稀疏矩阵，我们可以用稀疏矩阵的形式表示，我</span>
-<span class="err">们把</span><span class="n">web</span><span class="err">图中的每一个网页及其链出的网页作为一行，并给每个网页一个初始的</span><span class="n">pagerank</span><span class="err">值（一般为均值），这样上节的</span><span class="n">web</span><span class="err">图结构用如下方式表示：</span>
+<div class="hlcode"><pre><span class="err">对于互联网上的数以百亿级的网页来说，构成的转移矩阵非常大，直接按矩阵乘法的计算方法不可行，需要借助</span><span class="n">Map</span><span class="o">-</span><span class="n">Reduce</span><span class="err">的计算方式来解决。考虑转移矩阵是一个稀疏矩阵，我们可以用稀疏矩阵的形式表示，我们把</span><span class="n">web</span><span class="err">图中的每一个网页及其链出的网页作为一行，并给每个网页一个初始的</span><span class="n">pagerank</span><span class="err">值（一般为均值），这样上节的</span><span class="n">web</span><span class="err">图结构用如下方式表示：</span>
   <span class="mf">1.</span> <span class="n">A</span> <span class="n">C</span> <span class="n">D</span>
   <span class="mf">2.</span> <span class="n">B</span> <span class="n">B</span>
   <span class="mf">3.</span> <span class="n">C</span> <span class="n">B</span>
@@ -124,14 +104,12 @@
 
 
 <h3 id="map">Map阶段</h3>
-<div class="hlcode"><pre><span class="n">Map</span><span class="err">操作的每一行，对所有出链发射当前网页概率值的</span><span class="mi">1</span><span class="o">/</span><span class="n">k</span><span class="err">，</span><span class="n">k</span><span class="err">是当前网页的出链数，比如对第一行输出</span><span class="o">&lt;</span>
-<span class="n">C</span><span class="p">,</span><span class="mf">0.25</span><span class="o">*</span><span class="mf">0.5</span><span class="o">&gt;</span><span class="err">，</span><span class="o">&lt;</span><span class="n">D</span><span class="p">,</span><span class="mf">0.25</span><span class="o">*</span><span class="mf">0.5</span><span class="o">&gt;</span><span class="err">，其中</span><span class="mf">0.25</span><span class="err">是当前网页的概率。</span>
+<div class="hlcode"><pre><span class="n">Map</span><span class="err">操作的每一行，对所有出链发射当前网页概率值的</span><span class="mi">1</span><span class="o">/</span><span class="n">k</span><span class="err">，</span><span class="n">k</span><span class="err">是当前网页的出链数，比如对第一行输出</span><span class="o">&lt;</span><span class="n">C</span><span class="p">,</span><span class="mf">0.25</span><span class="o">*</span><span class="mf">0.5</span><span class="o">&gt;</span><span class="err">，</span><span class="o">&lt;</span><span class="n">D</span><span class="p">,</span><span class="mf">0.25</span><span class="o">*</span><span class="mf">0.5</span><span class="o">&gt;</span><span class="err">，其中</span><span class="mf">0.25</span><span class="err">是当前网页的概率。</span>
 </pre></div>
 
 
 <h3 id="reduce">Reduce阶段</h3>
-<div class="hlcode"><pre><span class="n">Reduce</span><span class="err">操作收集</span><span class="n">id</span><span class="err">相同的网页得分值，累加并按权重计算，</span><span class="n">pi</span><span class="err">＝</span><span class="n">a</span><span class="o">*</span><span class="p">(</span><span class="n">p1</span><span class="o">+</span><span class="n">p2</span><span class="o">+</span><span class="p">...</span><span class="o">+</span><span class="n">pm</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="err">，</span>
-<span class="err">其中</span><span class="n">m</span><span class="err">是指向网页</span><span class="n">i</span><span class="err">的网页书，</span><span class="n">n</span><span class="err">是所有网页数目。</span>
+<div class="hlcode"><pre><span class="n">Reduce</span><span class="err">操作收集</span><span class="n">id</span><span class="err">相同的网页得分值，累加并按权重计算，</span><span class="n">pi</span><span class="err">＝</span><span class="n">a</span><span class="o">*</span><span class="p">(</span><span class="n">p1</span><span class="o">+</span><span class="n">p2</span><span class="o">+</span><span class="p">...</span><span class="o">+</span><span class="n">pm</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="o">/</span><span class="n">n</span><span class="err">，其中</span><span class="n">m</span><span class="err">是指向网页</span><span class="n">i</span><span class="err">的网页书，</span><span class="n">n</span><span class="err">是所有网页数目。</span>
 </pre></div>
 
 
@@ -276,7 +254,7 @@
 <span class="n">cat</span> <span class="n">link_all</span> <span class="o">|</span> <span class="n">sort</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">k</span> <span class="mi">1</span> <span class="o">-</span><span class="n">t</span> <span class="err">\</span><span class="n">t</span> <span class="o">|</span> <span class="n">python</span> <span class="n">PageRank_mapper</span><span class="p">.</span><span class="n">py</span> <span class="o">|</span> <span class="n">sort</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">k</span> <span class="mi">1</span> <span class="o">-</span><span class="n">t</span> <span class="err">\</span><span class="n">t</span> <span class="o">|</span> <span class="n">python</span> <span class="n">PageRank_reducer</span><span class="p">.</span><span class="n">py</span> <span class="o">&gt;</span> <span class="n">page_rank_val</span>
 <span class="n">done</span>
 
-<span class="nl">ps:</span> <span class="err">用</span><span class="n">python</span><span class="err">或者</span><span class="n">c</span><span class="o">++</span><span class="err">调用</span><span class="n">hadoop</span><span class="err">的</span><span class="n">streaming</span><span class="err">，</span><span class="n">pagerank</span><span class="err">过程就能</span><span class="n">run</span><span class="err">了。有关</span><span class="n">hadoop</span> <span class="n">streaming</span><span class="err">的教程可参考“董的博客</span><span class="o">&gt;&gt;</span><span class="n">Hadoop</span> <span class="n">Streaming</span><span class="err">编程”</span>
+<span class="nl">ps:</span> <span class="n">link_all</span><span class="err">是输入文件，格式如上介绍稀疏矩阵所示。用</span><span class="n">python</span><span class="err">或者</span><span class="n">c</span><span class="o">++</span><span class="err">调用</span><span class="n">hadoop</span><span class="err">的</span><span class="n">streaming</span><span class="err">，</span><span class="n">pagerank</span><span class="err">过程就能</span><span class="n">run</span><span class="err">了，一般循环</span><span class="mi">40</span><span class="err">次左右就能收敛。有关</span><span class="n">hadoop</span> <span class="n">streaming</span><span class="err">的教程可参考“董的博客</span><span class="o">&gt;&gt;</span><span class="n">Hadoop</span> <span class="n">Streaming</span><span class="err">编程”</span>
 <span class="nl">http:</span><span class="c1">//dongxicheng.org/mapreduce/hadoop-streaming-programming/。</span>
 </pre></div>
     </div>
@@ -284,7 +262,7 @@
       <span>
         <p>Copyright © 2016 jasonqhjia.
         Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.</p>
-        <p>Site Generated 2016-08-21 19:58:26</p>
+        <p>Site Generated 2016-08-21 20:12:17</p>
       </span>
     </div>
   </body>
