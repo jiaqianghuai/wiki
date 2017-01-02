@@ -17,7 +17,7 @@
           messageStyle: "none"
       });
     </script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   </head>
 
   <body>
@@ -59,15 +59,12 @@
 
 
 <h3 id="2">2. 为什么负梯度方向是下降最快的方向？</h3>
-<div class="hlcode"><pre><span class="p">(</span><span class="n">A</span><span class="p">)</span> <span class="err">将目标函数$</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="err">$在$</span><span class="n">x_</span><span class="p">{</span><span class="n">k</span><span class="p">}</span><span class="err">$泰勒级数展开，如下所示：</span>
-</pre></div>
-
-
-<p>$$ f(x) = f(x_{k}) + \nabla^Tf(x_{k})(x - x_{k}) + o(x_{k}) $$
-    其中$x_{k}$表示滴k次极值迭代点，$\nabla^Tf(x_{k})$是f(x)在$x_{k}$处的偏导，$o(x_{k})$表示高阶无穷小。
-    (B) 将迭代公式$x_{k+1} = x_{k} + \alpha_{k}p_{k}$ (其中p是下降方向，有$||p||=1$，而$\alpha$是迭代步长，可以通过wolfe condition得到) 带入上式，可得
-    $$ f(x_{k} + {\alpha}p) = f(x_{k}) + \alpha\nabla^Tf(x_{k})p + o(x_{k}) $$
-    其中为了让$f(x_{k} + {\alpha}p) &lt; f(x_{k})$，需要满足$\nabla^Tf(x_{k})p &lt; 0$ (o(x_{k})高阶无穷小，可以忽略)。$\nabla^Tf(x_{k})$和p都是向量，从而满足$\nabla^Tf(x_{k})p$是向量内积，因此满足：$\cos{\theta} = \frac{\nabla^Tf(x_{k})p}{||\nabla^Tf(x_{k})||||p||}$，众所周知，$-1 \leq\ cos{\theta} \leq 1$，因此当$cos{\theta}=-1$时，$\nabla^Tf(x_{k})p$取得最小值。为使等式成立，梯度向量p需要满足$p=-\frac{\nabla^Tf(x_{k})}{||\nabla^Tf(x_{k})||}$，也即负梯度方向，沿着这个方向目标函数值下降最快。</p>
+<p>(A) 将目标函数$f(x)$在$x_{k}$泰勒级数展开，如下所示：
+$$ f(x) = f(x_{k}) + \nabla^Tf(x_{k})(x - x_{k}) + o(x_{k}) $$
+其中$x_{k}$表示滴k次极值迭代点，$\nabla^Tf(x_{k})$是f(x)在$x_{k}$处的偏导，$o(x_{k})$表示高阶无穷小。
+(B) 将迭代公式$x_{k+1} = x_{k} + \alpha_{k}p_{k}$ (其中p是下降方向，有$||p||=1$，而$\alpha$是迭代步长，可以通过wolfe condition得到) 带入上式，可得
+$$ f(x_{k} + {\alpha}p) = f(x_{k}) + \alpha\nabla^Tf(x_{k})p + o(x_{k}) $$
+其中为了让$f(x_{k} + {\alpha}p) &lt; f(x_{k})$，需要满足$\nabla^Tf(x_{k})p &lt; 0$ (o(x_{k})高阶无穷小，可以忽略)。$\nabla^Tf(x_{k})$和p都是向量，从而满足$\nabla^Tf(x_{k})p$是向量内积，因此满足：$\cos{\theta} = \frac{\nabla^Tf(x_{k})p}{||\nabla^Tf(x_{k})||||p||}$，众所周知，$-1 \leq\ cos{\theta} \leq 1$，因此当$cos{\theta}=-1$时，$\nabla^Tf(x_{k})p$取得最小值。为使等式成立，梯度向量p需要满足$p=-\frac{\nabla^Tf(x_{k})}{||\nabla^Tf(x_{k})||}$，也即负梯度方向，沿着这个方向目标函数值下降最快。</p>
 <h3 id="3">3. 优缺点</h3>
 <div class="hlcode"><pre><span class="o">*</span> <span class="err">优点：程序简单，计算量小；对初始点没有特别的要求；最速下降法是整体收敛的，且为线性收敛。</span>
 <span class="o">*</span> <span class="err">缺点：它只在局部范围内具有“最速”属性，</span> <span class="err">对整体求解过程，它的下降速度是缓慢的。靠近极小值时速度减慢；可能会&#39;之字型&#39;地下降。</span>
@@ -89,7 +86,7 @@
       <span>
         <p>Copyright © 2017 jasonqhjia.
         Powered by <a href="http://simiki.org/" target="_blank">Simiki</a>.</p>
-        <p>Site Generated 2017-01-02 23:12:57</p>
+        <p>Site Generated 2017-01-02 23:22:33</p>
       </span>
     </div>
   </body>
