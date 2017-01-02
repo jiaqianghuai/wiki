@@ -15,12 +15,12 @@ date: 2016-07-23 20:35
 	以负梯度方向作为极小化方法的下降方向，就叫做最速下降法。
 
 ### 2. 为什么负梯度方向是下降最快的方向？ ###
-	(A) 将目标函数$f(x)$在$x_{k}$泰勒级数展开，如下所示：
+(A) 将目标函数$f(x)$在$x_{k}$泰勒级数展开，如下所示：
 $$ f(x) = f(x_{k}) + \nabla^Tf(x_{k})(x - x_{k}) + o(x_{k}) $$
-	其中$x_{k}$表示滴k次极值迭代点，$\nabla^Tf(x_{k})$是f(x)在$x_{k}$处的偏导，$o(x_{k})$表示高阶无穷小。
-	(B) 将迭代公式$x_{k+1} = x_{k} + \alpha_{k}p_{k}$ (其中p是下降方向，有$||p||=1$，而$\alpha$是迭代步长，可以通过wolfe condition得到) 带入上式，可得
-	$$ f(x_{k} + {\alpha}p) = f(x_{k}) + \alpha\nabla^Tf(x_{k})p + o(x_{k}) $$
-	其中为了让$f(x_{k} + {\alpha}p) < f(x_{k})$，需要满足$\nabla^Tf(x_{k})p < 0$ (o(x_{k})高阶无穷小，可以忽略)。$\nabla^Tf(x_{k})$和p都是向量，从而满足$\nabla^Tf(x_{k})p$是向量内积，因此满足：$\cos{\theta} = \frac{\nabla^Tf(x_{k})p}{||\nabla^Tf(x_{k})||||p||}$，众所周知，$-1 \leq\ cos{\theta} \leq 1$，因此当$cos{\theta}=-1$时，$\nabla^Tf(x_{k})p$取得最小值。为使等式成立，梯度向量p需要满足$p=-\frac{\nabla^Tf(x_{k})}{||\nabla^Tf(x_{k})||}$，也即负梯度方向，沿着这个方向目标函数值下降最快。
+其中$x_{k}$表示滴k次极值迭代点，$\nabla^Tf(x_{k})$是f(x)在$x_{k}$处的偏导，$o(x_{k})$表示高阶无穷小。
+(B) 将迭代公式$x_{k+1} = x_{k} + \alpha_{k}p_{k}$ (其中p是下降方向，有$||p||=1$，而$\alpha$是迭代步长，可以通过wolfe condition得到) 带入上式，可得
+$$ f(x_{k} + {\alpha}p) = f(x_{k}) + \alpha\nabla^Tf(x_{k})p + o(x_{k}) $$
+其中为了让$f(x_{k} + {\alpha}p) < f(x_{k})$，需要满足$\nabla^Tf(x_{k})p < 0$ (o(x_{k})高阶无穷小，可以忽略)。$\nabla^Tf(x_{k})$和p都是向量，从而满足$\nabla^Tf(x_{k})p$是向量内积，因此满足：$\cos{\theta} = \frac{\nabla^Tf(x_{k})p}{||\nabla^Tf(x_{k})||||p||}$，众所周知，$-1 \leq\ cos{\theta} \leq 1$，因此当$cos{\theta}=-1$时，$\nabla^Tf(x_{k})p$取得最小值。为使等式成立，梯度向量p需要满足$p=-\frac{\nabla^Tf(x_{k})}{||\nabla^Tf(x_{k})||}$，也即负梯度方向，沿着这个方向目标函数值下降最快。
 
 ### 3. 优缺点 ###
 
